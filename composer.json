@@ -1,16 +1,16 @@
 {
-	"name": "netliva/reusable-template",
+	"name": "netliva/symfony-commenter",
 	"license": "MIT",
-	"type": "library",
-	"description": "Netliva Xxx Library",
+	"type": "symfony-bundle",
+	"description": "Netliva Symfony Comment Library",
 	"autoload": {
 		"psr-4": {
-			"Netliva\\XxxBundle\\": "src/"
+			"Netliva\\CommentBundle\\": "src/"
 		}
 	},
 	"require": {
-		"php": ">=5.3.3",
-		"symfony/framework-bundle": "~2.7|~3.0|~4.0"
+		"php": "^7.1.3",
+		"symfony/framework-bundle": "~4.0|~5.0"
 	},
 	"minimum-stability": "stable"
 }

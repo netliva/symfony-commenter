@@ -1,0 +1,10 @@
+services:
+    Netliva\XxxBundle\Services\ExampleServices:
+        public: false
+        arguments: ["@doctrine.orm.entity_manager"]
+        tags:
+            - { name: twig.extension }
+
+    netliva.example:
+        alias: Netliva\XxxBundle\Services\ExampleServices
+        public: true

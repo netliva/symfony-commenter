@@ -1,0 +1,16 @@
+{
+	"name": "netliva/reusable-template",
+	"license": "MIT",
+	"type": "library",
+	"description": "Netliva Xxx Library",
+	"autoload": {
+		"psr-4": {
+			"Netliva\\XxxBundle\\": "src/"
+		}
+	},
+	"require": {
+		"php": ">=5.3.3",
+		"symfony/framework-bundle": "~2.7|~3.0|~4.0"
+	},
+	"minimum-stability": "stable"
+}

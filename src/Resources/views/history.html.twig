@@ -1,0 +1,16 @@
+<table class="table table-stipped">
+	{% for time, row in comment.history %}
+		<tr>
+			<td>
+				<small class="float-right">{{ time|date("d.m.Y H:i") }}</small>
+				{{ row.comment|nl2br }}
+			</td>
+		</tr>
+	{% endfor %}
+	<tr>
+		<td>
+			<small class="float-right">{{ comment.editAt|date("d.m.Y H:i") }}</small>
+			{{ comment.comment|nl2br }}
+		</td>
+	</tr>
+</table>

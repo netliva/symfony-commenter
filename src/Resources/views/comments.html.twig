@@ -1,0 +1,13 @@
+<div
+	class="netliva-comments-area comm-grp-{{group}} comm-type-{{listType}}"
+	data-create-url="{{ path('netliva_symfony_comments_create') }}"
+	data-refresh-url="{{ path('netliva_symfony_comments_list', {"group": group, "listType": listType}) }}"
+	data-group="{{ group }}"
+>
+	<div class="text-center"><button class="netliva-show-old-comments-btn btn-sm btn btn-link mt-2">{# Eski yorumları yüklenme butonu #}</button></div>
+	<ul class="list-unstyled">
+		{# Yorumlar AJAX ile yüklenecek #}
+		<li class='text-center loader-block showed-comment'><div class="netliva-lds-blocks"><div></div><div></div><div></div></div></li>
+	</ul>
+	<div class="netliva-comment-input-area"></div>
+</div>

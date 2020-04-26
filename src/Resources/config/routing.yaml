@@ -1,0 +1,27 @@
+netliva_symfony_comments_commentbox:
+    path:     /comments/box/{group}/{listType}
+    defaults: { _controller: NetlivaCommentBundle:Comments:commentBox }
+
+netliva_symfony_comments_list:
+    path:     /comments/list/{group}/{listType}/{limit}/{limitId}
+    defaults: { _controller: NetlivaCommentBundle:Comments:list, limitId: null, limit: 5 }
+
+netliva_symfony_comments_create:
+    path:     /comments/create
+    defaults: { _controller: NetlivaCommentBundle:Comments:create }
+    methods: [POST]
+
+netliva_symfony_comments_history:
+    path:     /comments/history/{id}
+    defaults: { _controller: NetlivaCommentBundle:Comments:history }
+
+netliva_symfony_comments_update:
+    path:     /comments/update/{viewtype}/{id}
+    defaults: { _controller: NetlivaCommentBundle:Comments:update }
+    methods: [POST, PUT]
+
+netliva_symfony_comments_delete:
+    path:     /comments/delete/{id}
+    defaults: { _controller: NetlivaCommentBundle:Comments:delete }
+    methods: [POST, DELETE]
+

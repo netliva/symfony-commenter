@@ -1,0 +1,38 @@
+
+	{% for row in comments %}
+		<li
+			class="netliva-comments-line {{ app.user.id == row.author.id ? "netliva-my-comment" }}"
+			data-id="{{row.id}}"
+			data-comment="{{row.comment}}"
+			data-comment-id="{{row.id}}"
+			data-delete-url="{{path("netliva_symfony_comments_delete",{id:row.id})}}"
+			data-update-url="{{path("netliva_symfony_comments_update",{id:row.id, viewtype:"default" })}}"
+			data-history-url="{{path("netliva_symfony_comments_history",{id:row.id })}}"
+		>
+			<div class="netliva-a-comment">
+				{% if app.user.id == row.author.id %}
+					<div class="text-left dropdown">
+						<a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false"></a>
+						<div class="dropdown-menu">
+							<a class="dropdown-item netliva-comment-edit-btn" href="#">Düzenle</a>
+							<a class="dropdown-item netliva-comment-delete-btn" href="#">Sil</a>
+						</div>
+					</div>
+				{% endif %}
+				<p>
+					<strong>{{row.author.name }}</strong>
+					{{ row.comment|nl2br }}
+					<small>
+						{% if row.history is iterable and row.history|length %}
+							<span class="px-1 netliva-comment-history"><i class="fa fa-history"></i></span>
+						{% endif %}
+						<em {{ (row.editAt ? 'class="tooltip-button" title="Düzenlenme: '~row.editAt|date("d.m.Y_H:i")~'"')|raw}}>
+							{{ row.addAt|date("d.m.Y - H:i") }}
+							{{ row.editor and row.editor.id != row.author.id ? " ("~row.editor.name~" düzenledi)":"" }}
+						</em>
+					</small>
+				</p>
+
+			</div>
+		</li>
+	{% endfor %}

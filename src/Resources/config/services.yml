@@ -1,10 +1,10 @@
 services:
-    Netliva\CommentBundle\Services\ExampleServices:
+    Netliva\CommentBundle\Services\CommentServices:
         public: false
-        arguments: ["@doctrine.orm.entity_manager"]
+        arguments: ["@doctrine.orm.entity_manager", "@twig"]
         tags:
             - { name: twig.extension }
 
-    netliva.example:
-        alias: Netliva\CommentBundle\Services\ExampleServices
+    netliva.commenter:
+        alias: Netliva\CommentBundle\Services\CommentServices
         public: true

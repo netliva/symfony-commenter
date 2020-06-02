@@ -66,6 +66,23 @@ class Users implements UserInterface, \Serializable, AuthorInterface
 }
 
 ```
+Gerekli ayarları ekleyin;
+
+```yaml
+# config/packages/netliva_commenter.yaml
+doctrine:
+  orm:
+    resolve_target_entities:
+      Netliva\CommentBundle\Entity\AuthorInterface: App\Entity\Users
+
+```
+
+```yaml
+# config/routes/netliva_commenter.yaml
+netliva_comment_route:
+    resource: '@NetlivaCommentBundle/Resources/config/routing.yaml'
+    prefix: /netliva
+```
 
 
 ## Kullanma

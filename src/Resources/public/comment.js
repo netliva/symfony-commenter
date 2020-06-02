@@ -27,12 +27,11 @@
 				show_old_btn	: ".netliva-show-old-comments-btn",
 			},
 			t : {
-				input: `
-					<div class="d-flex comment-input-container">
-						<textarea class="form-control netliva-comment-input" rows="1" placeholder="Yorum"></textarea>
-						<button class="btn btn-xs btn-success netliva-send-comment-btn"><i class="fa fa-paper-plane"></i></button>
-					</div>
-				`,
+				input: '<div class="d-flex comment-input-container">\
+						<textarea class="form-control netliva-comment-input" rows="1" placeholder="Yorum"></textarea>\
+						<button class="btn btn-xs btn-success netliva-send-comment-btn"><i class="fa fa-paper-plane"></i></button>\
+					</div>\
+				',
 			},
 			loaders	: {
 				ring: '<div class="netliva-lds-ring"><div></div><div></div><div></div><div></div></div>',
@@ -200,7 +199,7 @@
 				$line.find(".comment-input-container").remove();
 				this.area.find(commenter.e.input_area).show();
 			},
-			show_error (response)
+			show_error: function (response)
 			{
 				var text = "";
 				if (typeof response.responseJSON == 'undefined')
@@ -311,24 +310,24 @@
 					$("#netliva_comment_modal").modal("hide");
 				},
 				create: function () {
-					$("body").append(`
-						<div class="modal fade" id="netliva_comment_modal" tabindex="-1" role="dialog" aria-labelledby="netliva_comment_modal" aria-hidden="true">
-						  <div class="modal-dialog" role="document">
-							<div class="modal-content">
-							  <div class="modal-header">
-								<h5 class="modal-title">Modal title</h5>
-								<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-								  <span aria-hidden="true">&times;</span>
-								</button>
-							  </div>
-							  <div class="modal-body"> ... </div>
-							  <div class="modal-footer bg-light" style="display: none;"></div>
-							</div>
-						  </div>
-						</div>
-					`);
+					$("body").append('\
+						<div class="modal fade" id="netliva_comment_modal" tabindex="-1" role="dialog" aria-labelledby="netliva_comment_modal" aria-hidden="true">\
+						  <div class="modal-dialog" role="document">\
+							<div class="modal-content">\
+							  <div class="modal-header">\
+								<h5 class="modal-title">Modal title</h5>\
+								<button type="button" class="close" data-dismiss="modal" aria-label="Close">\
+								  <span aria-hidden="true">&times;</span>\
+								</button>\
+							  </div>\
+							  <div class="modal-body"> ... </div>\
+							  <div class="modal-footer bg-light" style="display: none;"></div>\
+							</div>\
+						  </div>\
+						</div>\
+					');
 				},
-				create_buttons($btns)
+				create_buttons: function($btns)
 				{
 					if ($btns !== null)
 					{
@@ -336,13 +335,13 @@
 						$("#netliva_comment_modal").find('.modal-footer').html('');
 						$.each($btns, function (index, button)
 						{
-							let btnClass = "success";
+							var btnClass = "success";
 							if (typeof (button.class) !== "undefined")
 								btnClass = button.class;
 							else if (button.action === 'close')
 								btnClass = "danger";
 
-							let $btnTxt = '<button id="netliva_comment_modal_btn_' + index + '"';
+							var $btnTxt = '<button id="netliva_comment_modal_btn_' + index + '"';
 							if (button.action === 'close')
 								$btnTxt += 'data-dismiss="modal"';
 							$btnTxt += 'class="btn btn-' + btnClass + '" type="button">' + button.label + '</button>';

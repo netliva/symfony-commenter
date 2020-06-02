@@ -5,7 +5,7 @@ namespace Netliva\CommentBundle\Controller;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Netliva\CommentBundle\Entity\Comments;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -14,7 +14,7 @@ use function Doctrine\ORM\QueryBuilder;
 /**
  * Comments controller.
  */
-class CommentsController extends AbstractController
+class CommentsController extends Controller
 {
 	public function commentBoxAction($group, $listType)
 	{
@@ -131,7 +131,7 @@ class CommentsController extends AbstractController
 		if (!$entity) {
 			return new JsonResponse(array('situ' => "error", "errors" => ["title"=>["Unable to find Reminder entity."]]));
 		}
-		
+
 		return $this->render("@NetlivaComment/history.html.twig", array(
 			'comment' => $entity,
 		));

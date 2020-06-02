@@ -1,5 +1,6 @@
 services:
     Netliva\CommentBundle\Services\CommentServices:
+        class: Netliva\CommentBundle\Services\CommentServices
         public: false
         arguments: ["@doctrine.orm.entity_manager", "@twig"]
         tags:

@@ -37,7 +37,7 @@ class CommentsController extends Controller
 			->where('comments.group = :gr')
 			->setParameter("gr",$group)
 			->getQuery()->getSingleResult();
-
+		$count = (int) $count["total"];
 
 		$qb = $em->getRepository('NetlivaCommentBundle:Comments')->createQueryBuilder("c");
 		$qb->where($qb->expr()->eq("c.group", ":g"));
@@ -62,14 +62,24 @@ class CommentsController extends Controller
 			$lastId = $first->getId();
 		}
 
+		if ($count)
+		{
+			$html = $this->renderView('@NetlivaComment/comment.'.$listType.'.html.twig', array(
+				'group' => $group,
+				'comments' => $comments,
+			));
+		}
+		else
+		{
+			$html = '<li class="text-center"><em>İlk Yorumu Sen Yap</em></li>';
+		}
+
+
 		return new JsonResponse([
-			'total' => (int) $count["total"],
-			'count' => count($comments),
+			'total'  => $count,
+			'count'  => count($comments),
 			'lastId' => $lastId,
-			'html'  => $this->renderView('@NetlivaComment/comment.'.$listType.'.html.twig', array(
-						'group' => $group,
-						'comments' => $comments,
-					))
+			'html'   => $html
 		]);
 
 	}

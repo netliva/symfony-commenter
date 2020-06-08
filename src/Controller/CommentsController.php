@@ -2,13 +2,13 @@
 
 namespace Netliva\CommentBundle\Controller;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-
 use Netliva\CommentBundle\Entity\Comments;
+use Netliva\CommentBundle\Event\AfterAddCommentEvent;
+use Netliva\CommentBundle\Event\NetlivaCommenterEvents;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use function Doctrine\ORM\QueryBuilder;
 
 /**
@@ -101,6 +101,12 @@ class CommentsController extends Controller
 
 		$em->persist($entity);
 		$em->flush();
+
+
+		$eventDispatcher = $this->get('event_dispatcher');
+		$event = new AfterAddCommentEvent($entity);
+		$eventDispatcher->dispatch(NetlivaCommenterEvents::AFTER_ADD, $event);
+
 
 		return new JsonResponse( ["situ" => "success", 'id' => $entity->getId()] );
 	}

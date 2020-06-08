@@ -9,3 +9,7 @@ services:
     netliva.commenter:
         alias: Netliva\CommentBundle\Services\CommentServices
         public: true
+
+    netliva_commenter.comments_controller:
+        class: Netliva\CommentBundle\Controller\CommentsController
+        arguments: ["@event_dispatcher"]

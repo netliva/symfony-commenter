@@ -4,6 +4,7 @@
 	data-refresh-url="{{ path('netliva_symfony_comments_list', {"group": group, "listType": listType}) }}"
 	data-group="{{ group }}"
 >
+	{{ topContent|raw }}
 	<div class="text-center"><button class="netliva-show-old-comments-btn btn-sm btn btn-link mt-2">{# Eski yorumları yüklenme butonu #}</button></div>
 	<ul class="list-unstyled">
 		{# Yorumlar AJAX ile yüklenecek #}

@@ -4,6 +4,7 @@ namespace Netliva\CommentBundle\Controller;
 
 use Doctrine\ORM\EntityManager;
 use Netliva\CommentBundle\Entity\Comments;
+use Netliva\CommentBundle\Entity\CommentsGroupInfo;
 use Netliva\CommentBundle\Event\AfterAddCommentEvent;
 use Netliva\CommentBundle\Event\NetlivaCommenterEvents;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -16,17 +17,6 @@ use function Doctrine\ORM\QueryBuilder;
  */
 class CommentsController extends Controller
 {
-	public function commentBoxAction($group, $listType)
-	{
-		$em = $this->getDoctrine()->getManager();
-		return $this->render("@NetlivaComment/comments.html.twig", array(
-			'group' => $group,
-			'listType' => $listType,
-		));
-
-	}
-
-
 	public function listAction($group, $listType, $limitId, $limit)
 	{
 		/** @var EntityManager $em */
@@ -85,7 +75,6 @@ class CommentsController extends Controller
 	}
 
 
-
 	public function createAction(Request $request)
 	{
 		$entity = new Comments();
@@ -113,12 +102,43 @@ class CommentsController extends Controller
 		$em->flush();
 
 
+		$collaborators = $this->addCollaborators($group, $this->getUser()->getId());
+
 		$eventDispatcher = $this->get('event_dispatcher');
-		$event = new AfterAddCommentEvent($entity);
+		$event = new AfterAddCommentEvent($entity, $collaborators);
 		$eventDispatcher->dispatch(NetlivaCommenterEvents::AFTER_ADD, $event);
 
 
 		return new JsonResponse( ["situ" => "success", 'id' => $entity->getId()] );
+	}
+
+	public function removeCollaboratorsAction (Request $request, $group)
+	{
+		$em = $this->getDoctrine()->getManager();
+
+		$colInfoEntity = $em->getRepository('NetlivaCommentBundle:CommentsGroupInfo')->findOneBy(['group' => $group, 'key'=> 'collaborators']);
+
+		if ($colInfoEntity and $colInfoEntity->getInfo() and is_array($colInfoEntity->getInfo()) && in_array($this->getUser()->getId(), $colInfoEntity->getInfo()))
+		{
+			$info = $colInfoEntity->getInfo();
+
+			if (($key = array_search($this->getUser()->getId(), $info)) !== false) {
+				unset($info[$key]);
+			}
+
+			$colInfoEntity->setInfo($info);
+			$em->flush();
+		}
+
+		return new JsonResponse( ["situ" => "success"] );
+	}
+
+
+	public function createCollaboratorsAction (Request $request, $group)
+	{
+		$collaborators = $this->addCollaborators($group, $request->request->get('author'));
+
+		return new JsonResponse( ["situ" => "success"] );
 	}
 
 	private function commentNotify($identify, $whoId, $textId, $vars, $link)
@@ -212,5 +232,27 @@ class CommentsController extends Controller
 		$em->flush();
 
 		return new JsonResponse( array('situ' => "success", "id" => $id) );
+	}
+
+	private function addCollaborators ($group, $authorId)
+	{
+		$em = $this->getDoctrine()->getManager();
+
+		$colInfoEntity = $em->getRepository('NetlivaCommentBundle:CommentsGroupInfo')->findOneBy(['group' => $group, 'key'=> 'collaborators']);
+		if (!$colInfoEntity)
+		{
+			$colInfoEntity = new CommentsGroupInfo();
+			$colInfoEntity->setGroup($group);
+			$colInfoEntity->setKey("collaborators");
+			$colInfoEntity->setInfo([]);
+			$em->persist($colInfoEntity);
+		}
+		$collaborators = $colInfoEntity->getInfo();
+		if (!in_array($authorId, $collaborators))
+			$collaborators[] = $authorId;
+		$colInfoEntity->setInfo($collaborators);
+		$em->flush();
+
+		return $collaborators;
 	}
 }

@@ -5,14 +5,23 @@
 	{
 		settings = $.extend({
 			create_url: $(this).data("createUrl"),
-			refresh_url: $(this).data("refreshUrl")
+			refresh_url: $(this).data("refreshUrl"),
+			new_coll_url: $(this).data("newcollUrl"),
+			removeme_url: $(this).data("removemeUrl"),
+			my_user: $(this).data("myUser")
 		}, settings);
 
 		var commenter = {
 			// ===============
 			area: null,
 			settings : {
-				create_url: null,
+				create_url   : null,
+				new_coll_url : null,
+				removeme_url : null,
+				refresh_url  : null,
+				users        : null,
+				all_users    : null,
+				my_user      : null
 			},
 			counts: {
 				limit: 5,
@@ -25,6 +34,7 @@
 			e : {
 				input_area		: ".netliva-comment-input-area",
 				show_old_btn	: ".netliva-show-old-comments-btn",
+				collaborators	: ".netliva-comment-collaborators-area",
 			},
 			t : {
 				input: '<div class="d-flex comment-input-container">\
@@ -37,7 +47,6 @@
 				ring: '<div class="netliva-lds-ring"><div></div><div></div><div></div><div></div></div>',
 				blocks: '<div class="netliva-lds-blocks"><div></div><div></div><div></div></div>',
 			},
-
 			// === FUNCTIONS ===
 			init: function (area, settings)
 			{
@@ -46,6 +55,67 @@
 				this.area.find(this.e.show_old_btn).click(this.actions.show_comment);
 				commenter.create_comment_input();
 				commenter.load_comments();
+				commenter.initalize_collaborators();
+			},
+			stringToColour: function(str) {
+				var hash = 0, i;
+				for (i = 0; i < str.length; i++) {
+					hash = str.charCodeAt(i) + ((hash << 5) - hash);
+				}
+				var colour = '#';
+				for (i = 0; i < 3; i++) {
+					var value = (hash >> (i * 8)) & 0xFF;
+					colour += ('00' + value.toString(16)).substr(-2);
+				}
+				return colour;
+			},
+			pickTextColorBasedOnBgColorAdvanced : function (bgColor, lightColor, darkColor) {
+				var color = (bgColor.charAt(0) === '#') ? bgColor.substring(1, 7) : bgColor;
+				var r = parseInt(color.substring(0, 2), 16); // hexToR
+				var g = parseInt(color.substring(2, 4), 16); // hexToG
+				var b = parseInt(color.substring(4, 6), 16); // hexToB
+				var uicolors = [r / 255, g / 255, b / 255];
+				var c = uicolors.map(function(col) {
+					if (col <= 0.03928) {
+						return col / 12.92;
+					}
+					return Math.pow((col + 0.055) / 1.055, 2.4);
+				});
+				var L = (0.2126 * c[0]) + (0.7152 * c[1]) + (0.0722 * c[2]);
+				return (L > 0.179) ? darkColor : lightColor;
+			},
+			getInitialsOfName: function (name) {
+				words = name.split(" ")
+				if (words.length === 1)
+					return words[0].substr(0,2);
+
+				return words[0].substr(0,1)+words[words.length-1].substr(0,1);
+			},
+			initalize_collaborators: function () {
+				var $e = this.area.find(this.e.collaborators);
+				commenter.settings.users = $e.data("users");
+				commenter.settings.all_users = $e.data("allAuthors");
+				$e.find(".netliva-comment-collaborators-add-btn").click(this.actions.add_collaborators);
+				$e.find(".netliva-comment-collaborators-remove-me-btn").click(this.actions.remove_me_from_collaborators);
+
+				this.prepare_collaborators();
+			},
+			prepare_collaborators: function () {
+				var $collaborators_ul = commenter.area.find(commenter.e.collaborators).find('ul');
+				$collaborators_ul.html("");
+				var flag = false;
+				$.each(commenter.settings.users, function (key, user) {
+					photo = '<i>'+commenter.getInitialsOfName(user.name)+'</i>'
+					if (user.photo)
+						photo = '<img src="'+user.photo+'" class="collaborator_avatar" />';
+
+					var bg = commenter.stringToColour(user.name);
+					var fg = commenter.pickTextColorBasedOnBgColorAdvanced(bg, '#FFFFFF', '#000000');
+					$collaborators_ul.append('<li data-user-id="'+user.id+'" style="background-color:'+bg+';color:'+fg+';">'+photo+'<span>'+user.name+'</span></li>');
+					if (user.id === commenter.settings.my_user.id) flag = true;
+				});
+				if (flag) commenter.area.find(".netliva-comment-collaborators-remove-me-btn").show();
+				else commenter.area.find(".netliva-comment-collaborators-remove-me-btn").hide();
 			},
 			create_comment_input: function () {
 				$input_conainer = $(commenter.t.input);
@@ -58,8 +128,8 @@
 				if (typeof position === "undefined") position = "before";
 
 				commenter.area.find(".loader-block").remove();
-				if (position == "before") commenter.area.find("ul").prepend("<li class='text-center loader-block'>"+commenter.loaders.blocks+"</li>");
-				else commenter.area.find("ul").append("<li class='text-center loader-block'>"+commenter.loaders.blocks+"</li>");
+				if (position == "before") commenter.area.find("ul.netliva-comment-list").prepend("<li class='text-center loader-block'>"+commenter.loaders.blocks+"</li>");
+				else commenter.area.find("ul.netliva-comment-list").append("<li class='text-center loader-block'>"+commenter.loaders.blocks+"</li>");
 
 				$.ajax({
 					url:commenter.settings.refresh_url+"/"+commenter.counts.limit+"/"+commenter.counts.last_id, dataType: "json", type: "post",
@@ -67,10 +137,10 @@
 						commenter.counts.loaded += response.count;
 						commenter.counts.total   = response.total;
 						commenter.counts.last_id = response.lastId;
-						if (position == "before") commenter.area.find("ul").prepend(response.html);
-						else commenter.area.find("ul").html(response.html);
+						if (position == "before") commenter.area.find("ul.netliva-comment-list").prepend(response.html);
+						else commenter.area.find("ul.netliva-comment-list").html(response.html);
 						commenter.update_show_btn();
-						commenter.area.find("ul > li:not(.binded)").each(commenter.actions.comment_btns)
+						commenter.area.find("ul.netliva-comment-list > li:not(.binded)").each(commenter.actions.comment_btns)
 					},
 				    complete: function () {
 					    commenter.area.find(".loader-block").remove();
@@ -106,6 +176,10 @@
 						commenter.counts.last_id = 0;
 						commenter.load_comments("over");
 						$input.val("").prop("disabled",false);
+
+						commenter.settings.users.push(commenter.settings.my_user);
+						commenter.prepare_collaborators();
+
 					},
 					error: function (response) {
 						commenter.show_error(response);
@@ -258,6 +332,7 @@
 				},
 				comment_btns: function () {
 					$(this).addClass("binded");
+					$(this).find(".ntlv_user_name").css("color", commenter.stringToColour($(this).find(".ntlv_user_name").text()));
 					$(this).find(".netliva-comment-edit-btn").click(function(){
 						commenter.update_comment($(this).closest("li"));
 						return false;
@@ -278,6 +353,92 @@
 					commenter.load_comments();
 
 					if (commenter.counts.limit<15) commenter.counts.limit += 2;
+				},
+				add_collaborators_close: function () {
+					var $collaborators_ul = commenter.area.find(commenter.e.collaborators).find('ul');
+					$collaborators_ul.find(".select_user_for_add").remove();
+					commenter.area.find(commenter.e.collaborators).find(".netliva-comment-collaborators-add-btn").show();
+				},
+				add_collaborators: function () {
+					commenter.area.find(commenter.e.collaborators).find(".netliva-comment-collaborators-add-btn").hide();
+
+					var $collaborators_ul = commenter.area.find(commenter.e.collaborators).find('ul');
+					var close_btn = '<svg class="ntlv-svg-icon" viewBox="0 0 20 20">  <path fill="none" d="M13.864,6.136c-0.22-0.219-0.576-0.219-0.795,0L10,9.206l-3.07-3.07c-0.219-0.219-0.575-0.219-0.795,0  c-0.219,0.22-0.219,0.576,0,0.795L9.205,10l-3.07,3.07c-0.219,0.219-0.219,0.574,0,0.794c0.22,0.22,0.576,0.22,0.795,0L10,10.795  l3.069,3.069c0.219,0.22,0.575,0.22,0.795,0c0.219-0.22,0.219-0.575,0-0.794L10.794,10l3.07-3.07  C14.083,6.711,14.083,6.355,13.864,6.136z M10,0.792c-5.086,0-9.208,4.123-9.208,9.208c0,5.085,4.123,9.208,9.208,9.208  s9.208-4.122,9.208-9.208C19.208,4.915,15.086,0.792,10,0.792z M10,18.058c-4.451,0-8.057-3.607-8.057-8.057  c0-4.451,3.606-8.057,8.057-8.057c4.449,0,8.058,3.606,8.058,8.057C18.058,14.45,14.449,18.058,10,18.058z"></path> </svg>'
+					$collaborators_ul.append('<li class="select_user_for_add"><div class="netliva_collaborator_search_area"><input type="text" /><button class="netliva_collaborator_search_close_btn">'+close_btn+'</button></div><ul></ul></li>');
+					$.each(commenter.settings.all_users, function (key, user) {
+						var flag = false;
+						$.each(commenter.settings.users, function (key2, user2) {
+							if (user.id === user2.id) flag = true;
+						});
+						if (!flag)
+						{
+							var bg = commenter.stringToColour(user.name);
+							var fg = commenter.pickTextColorBasedOnBgColorAdvanced(bg, '#FFFFFF', '#000000');
+							photo = '<i style="background-color:'+bg+';color:'+fg+';">'+commenter.getInitialsOfName(user.name)+'</i>'
+							if (user.photo)
+								photo = '<img src="'+user.photo+'" class="collaborator_avatar" style="border-color:'+bg+';" />';
+
+							$collaborators_ul.find("ul").append('<li data-key="'+key+'" data-user-id="'+user.id+'">'+photo+'<span>'+user.name+'</span></li>');
+						}
+					});
+					$collaborators_ul.find(".select_user_for_add ul li").click(function(){
+						data = commenter.settings.all_users[$(this).data("key")];
+						commenter.settings.users.push(data);
+						commenter.actions.add_collaborators_close();
+						commenter.prepare_collaborators();
+						$.ajax({
+							url: commenter.settings.new_coll_url,
+							data: {author: data.id},
+							dataType:"json", type:"post",
+							success:function(response) {
+								commenter.prepare_collaborators();
+							},
+							error: function (response) {
+								commenter.show_error(response);
+							},
+							complete: function () {
+							}
+						});
+					});
+					$collaborators_ul.find(".netliva_collaborator_search_close_btn").click(function(){
+						commenter.actions.add_collaborators_close();
+					});
+					$collaborators_ul.find(".select_user_for_add input")
+						.focus()
+						.keyup(function(e)
+						{
+							var code = (e.keyCode ? e.keyCode : e.which);
+							if (code === 27)
+							{
+								commenter.actions.add_collaborators_close();
+								return;
+							}
+							var searchText = $(this).val();
+							$collaborators_ul.find(".select_user_for_add ul > li").each(function()
+							{
+								var currentLiText = $(this).text(),
+									showCurrentLi = currentLiText.toLowerCase().indexOf(searchText.toLowerCase()) !== -1;
+								$(this).toggle(showCurrentLi);
+							});
+						});
+
+				},
+				remove_me_from_collaborators: function ()
+				{
+					$.ajax({
+						url: commenter.settings.removeme_url,
+						dataType:"json", type:"post",
+						success:function(response) {
+							commenter.settings.users = commenter.settings.users.filter(function(value, index, arr){ return value.id !== commenter.settings.my_user.id;});
+							commenter.prepare_collaborators();
+						},
+						error: function (response) {
+							commenter.show_error(response);
+						},
+						complete: function () {
+						}
+					});
+
 				},
 			},
 			modal: {

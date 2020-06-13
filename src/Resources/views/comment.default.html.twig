@@ -20,7 +20,7 @@
 					</div>
 				{% endif %}
 				<p>
-					<strong>{{row.author.name }}</strong>
+					<strong class="ntlv_user_name">{{row.author }}</strong>
 					{{ row.comment|nl2br }}
 					<small>
 						{% if row.history is iterable and row.history|length %}

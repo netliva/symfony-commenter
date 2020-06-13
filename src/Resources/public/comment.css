@@ -1,3 +1,7 @@
+.ntlv-svg-icon { width: 1em; height: 1em; }
+.ntlv-svg-icon path, .ntlv-svg-icon polygon, .ntlv-svg-icon rect { fill: #4691f6; }
+.ntlv-svg-icon circle { stroke: #4691f6; stroke-width: 1; }
+
 textarea.netliva-comment-input { margin-right: -30px; z-index: 2; transition: all 500ms; font-size: 0.8rem; height: 35px; overflow: hidden; }
 .netliva-comment-input:focus { margin-right: 5px; }
 .netliva-send-comment-btn { margin: 3px 10px 3px 0; transition: all 500ms; }
@@ -22,7 +26,7 @@ textarea.netliva-comment-input { margin-right: -30px; z-index: 2; transition: al
 .netliva-lds-blocks div { display: inline-block; position: absolute; left: 8px; width: 16px; background: #ccc; animation: netliva-lds-blocks 1.2s cubic-bezier(0, 0.5, 0.5, 1) infinite; }
 .netliva-lds-blocks div:nth-child(1) { left: 8px; animation-delay: -0.24s; }
 .netliva-lds-blocks div:nth-child(2) { left: 32px; animation-delay: -0.12s; }
-.netliva-lds-blocks div:nth-child(3) { left: 56px; animation-delay: 0; }
+.netliva-lds-blocks div:nth-child(3) { left: 56px; animation-delay: 0s; }
 @keyframes netliva-lds-blocks { 0% { top: 8px; height: 64px; } 50%, 100% { top: 24px; height: 32px; }
 }
 
@@ -48,3 +52,161 @@ textarea.netliva-comment-input { margin-right: -30px; z-index: 2; transition: al
 
 .netliva-comments-line .dropdown-menu a { color: #222; font-size: 0.9rem; padding: 0.2rem 0.8rem; }
 .netliva-comments-line small { opacity: 0.6 }
+
+
+
+
+/** Katılımcılar **/
+
+.netliva-comment-collaborators-area,
+.netliva-comment-collaborators-area ul {
+	align-items: center;
+	display: flex;
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	gap: 5px;
+}
+.netliva-comment-collaborators-area ul {
+	flex-wrap: wrap;
+}
+.netliva-comment-collaborators-area ul li {
+	position: relative;
+	height: 34px;
+	width: 34px;
+	display: flex;
+	align-items: center;
+	text-align: center;
+	justify-content: center;
+	border-radius: 50%;
+
+}
+.netliva-comment-collaborators-area ul li i {
+	font-style: normal;
+	font-size: 0.9rem;
+}
+.netliva-comment-collaborators-area .collaborator_avatar {
+	height: 30px;
+	width: 30px;
+	object-fit: cover;
+	border-radius: 50%;
+}
+.netliva-comment-collaborators-area svg.collaborator_avatar
+{
+	padding: 3px;
+}
+.netliva-comment-collaborators-area ul li span {
+	position: absolute; display: none;
+	left: -50%;
+	bottom: -15px;
+	font-size: 0.6rem;
+	white-space: nowrap; border-radius: 3px; color: white;
+	background: #222; padding:3px 8px; z-index: 9;
+}
+.netliva-comment-collaborators-area ul li:hover span {
+	display: block;
+}
+
+
+.netliva-comment-collaborators-area { padding: 5px;}
+.netliva-comment-collaborators-area > span {
+	white-space: nowrap;
+
+}
+.netliva-comment-collaborators-area > button {
+	background: none;
+	border: none;
+	font-size: 1.6rem;
+	line-height: 1; padding-top: 3px;
+}
+.netliva-comment-collaborators-area > button:hover {
+	opacity: .6;
+}
+.netliva-comment-collaborators-area .ntlv-svg-icon path,
+.netliva-comment-collaborators-area .ntlv-svg-icon polygon,
+.netliva-comment-collaborators-area .ntlv-svg-icon rect {
+	fill: #333;
+}
+
+.netliva-comment-collaborators-area .ntlv-svg-icon circle {
+	stroke: #333;
+	stroke-width: 1;
+}
+
+
+
+.netliva-comment-collaborators-remove-me-btn {
+	margin-left: auto;
+	font-size: 0.9rem !important;
+}
+.netliva-comment-collaborators-remove-me-btn svg {
+	font-size: 1.4rem;
+	vertical-align: middle;
+}
+
+
+/*** Katılımcı Seçimi ***/
+li.select_user_for_add {
+	width: auto !important;
+	position:relative;
+	border-radius: 0 !important;
+}
+
+.select_user_for_add ul {
+	background: white;
+	max-height: 200px; border-radius: 3px; box-shadow: 0 0 5px rgba(0,0,0,0.1) ;
+	overflow: auto;
+	display: block;
+	width: auto;
+	position: absolute;
+	margin: 0;
+	padding: 0;
+	top: 40px;
+	left: 0;
+}
+.select_user_for_add ul li {
+	width: auto; background: transparent !important;
+	text-align: left !important; cursor: pointer;
+	display: block; white-space: nowrap;
+	padding: 5px 15px; border-radius: 0;
+	margin: 0; height: auto;
+}
+.select_user_for_add ul li i {
+	width: 30px; height: 30px;  border-radius: 50%;
+	background: gray; display: inline-flex; align-items: center; justify-content:center; text-align: center;
+}
+.select_user_for_add ul li span {
+	display: inline-block;
+	position: relative;
+	right: auto;
+	left: auto;
+	bottom: auto;
+	top: auto;
+	background: transparent;
+	color: #222; font-size: 1rem;
+}
+.netliva-comment-collaborators-area ul li.select_user_for_add:hover li span  {
+	display: inline-block !important;
+}
+.netliva-comment-collaborators-area ul li.select_user_for_add:hover li:hover {
+	background-color: #87CFFF !important;
+}
+.select_user_for_add input {
+	background: white;
+	padding: 5px;
+	margin: 0;
+	border: 1px solid #999;
+}
+
+
+.netliva_collaborator_search_area {
+	display: flex;
+}
+.netliva_collaborator_search_close_btn {
+	background: transparent;
+	border:none;
+	padding:5px;
+}
+.netliva_collaborator_search_close_btn .ntlv-svg-icon {
+	font-size: 1.4rem;
+}

@@ -1,14 +1,41 @@
 <div
-	class="netliva-comments-area comm-grp-{{group}} comm-type-{{listType}}"
+	class="netliva-comments-area comm-grp-{{group}} comm-type-{{options.listType}}"
 	data-create-url="{{ path('netliva_symfony_comments_create') }}"
-	data-refresh-url="{{ path('netliva_symfony_comments_list', {"group": group, "listType": listType}) }}"
+	data-refresh-url="{{ path('netliva_symfony_comments_list', {"group": group, "listType": options.listType}) }}"
+	data-newcoll-url="{{ path('netliva_symfony_new_collaborators', {"group": group}) }}"
+	data-removeme-url="{{ path('netliva_symfony_remove_me', {"group": group}) }}"
+	data-my-user="{{ app.user|prepareCollaboratorsObject|json_encode }}"
+	data-my-user="{{ app.user|prepareCollaboratorsObject|json_encode }}"
 	data-group="{{ group }}"
 >
 	{{ topContent|raw }}
 	<div class="text-center"><button class="netliva-show-old-comments-btn btn-sm btn btn-link mt-2">{# Eski yorumları yüklenme butonu #}</button></div>
-	<ul class="list-unstyled">
+	<ul class="list-unstyled netliva-comment-list">
 		{# Yorumlar AJAX ile yüklenecek #}
 		<li class='text-center loader-block showed-comment'><div class="netliva-lds-blocks"><div></div><div></div><div></div></div></li>
 	</ul>
 	<div class="netliva-comment-input-area"></div>
+	{% if options.collaborators %}
+		<div class="netliva-comment-collaborators-area"
+			 data-users="{{ collaborators|json_encode }}"
+			 data-all-authors="{{ allAuthors|json_encode }}"
+		>
+			<span>Katılımcılar :</span>
+			<ul></ul>
+			<button class="netliva-comment-collaborators-add-btn">
+				<svg class="ntlv-svg-icon" viewBox="0 0 20 20">
+					<path fill="none" d="M13.388,9.624h-3.011v-3.01c0-0.208-0.168-0.377-0.376-0.377S9.624,6.405,9.624,6.613v3.01H6.613c-0.208,0-0.376,0.168-0.376,0.376s0.168,0.376,0.376,0.376h3.011v3.01c0,0.208,0.168,0.378,0.376,0.378s0.376-0.17,0.376-0.378v-3.01h3.011c0.207,0,0.377-0.168,0.377-0.376S13.595,9.624,13.388,9.624z M10,1.344c-4.781,0-8.656,3.875-8.656,8.656c0,4.781,3.875,8.656,8.656,8.656c4.781,0,8.656-3.875,8.656-8.656C18.656,5.219,14.781,1.344,10,1.344z M10,17.903c-4.365,0-7.904-3.538-7.904-7.903S5.635,2.096,10,2.096S17.903,5.635,17.903,10S14.365,17.903,10,17.903z"></path>
+				</svg>
+			</button>
+			<button class="netliva-comment-collaborators-remove-me-btn">
+				<svg class="ntlv-svg-icon" viewBox="0 0 20 20">
+					<path fill="none" d="M13.774,9.355h-7.36c-0.305,0-0.552,0.247-0.552,0.551s0.247,0.551,0.552,0.551h7.36
+								c0.304,0,0.551-0.247,0.551-0.551S14.078,9.355,13.774,9.355z M10.094,0.875c-4.988,0-9.031,4.043-9.031,9.031
+								s4.043,9.031,9.031,9.031s9.031-4.043,9.031-9.031S15.082,0.875,10.094,0.875z M10.094,17.809c-4.365,0-7.902-3.538-7.902-7.902
+								c0-4.365,3.538-7.902,7.902-7.902c4.364,0,7.902,3.538,7.902,7.902C17.996,14.271,14.458,17.809,10.094,17.809z"></path>
+				</svg>
+				Takibi Bırak
+			</button>
+		</div>
+	{% endif %}
 </div>

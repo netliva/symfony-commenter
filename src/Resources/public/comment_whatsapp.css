@@ -84,3 +84,11 @@
 	right: 7px;
 	left: auto;
 }
+
+
+.netliva-comment-collaborators-area {
+	margin: 15px -20px -20px;
+	background: #efeff0;
+	padding: 0 15px 10px;
+	border-radius: 4px;
+}

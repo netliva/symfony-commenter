@@ -4,10 +4,12 @@ namespace Netliva\CommentBundle\Services;
 
 use Netliva\CommentBundle\Event\CommentBoxEvent;
 use Netliva\CommentBundle\Event\NetlivaCommenterEvents;
+use Netliva\CommentBundle\Event\UserImageEvent;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Twig\Environment;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
+use Twig\TwigFilter;
 
 class CommentServices extends AbstractExtension
 {
@@ -25,6 +27,13 @@ class CommentServices extends AbstractExtension
 	}
 
 
+	public function getFilters()
+	{
+		return array(
+			new TwigFilter('prepareCollaboratorsObject', [$this, 'prepareCollaboratorsObject'], array('is_safe' => array('html'))),
+		);
+	}
+
 	public function getFunctions()
 	{
 		return array(
@@ -32,23 +41,78 @@ class CommentServices extends AbstractExtension
 		);
 	}
 
-
-
-	public function commentBox($group, $listType="default")
+	private function prepareAllCollaborators ()
 	{
+		$authors = $this->em->getRepository("NetlivaCommentBundle:AuthorInterface")->findAll();
+		$collaborators = [];
+		foreach ($authors as $author)
+		{
+			if ($author->isAuthor())
+				$collaborators[] = $this->prepareCollaboratorsObject($author);
+		}
+		return $collaborators;
+	}
 
-		$comments =	$this->em->getRepository('NetlivaCommentBundle:Comments')->findByGroup($group);
+	private function prepareCollaborators ($group)
+	{
+		$collaborators = null;
+		$colInfoEntity = $this->em->getRepository('NetlivaCommentBundle:CommentsGroupInfo')->findOneBy(['group' => $group, 'key'=> 'collaborators']);
+		if ($colInfoEntity)
+		{
+			$collaborators = $colInfoEntity->getInfo();
+		}
 
+		if (is_array($collaborators) and count($collaborators))
+		{
+			$qb = $this->em->getRepository("NetlivaCommentBundle:AuthorInterface")->createQueryBuilder("ai");
+			$qb->where($qb->expr()->in("ai.id", ":ids"));
+			$qb->setParameter('ids', $collaborators);
+			$authors = $qb->getQuery()->getResult();
+
+			$collaborators = [];
+			foreach ($authors as $author)
+			{
+				if ($author->isAuthor())
+					$collaborators[] = $this->prepareCollaboratorsObject($author);
+			}
+			return $collaborators;
+		}
+
+		return [];
+	}
+
+	public function prepareCollaboratorsObject($author)
+	{
 		$eventDispatcher = $this->container->get('event_dispatcher');
-		$event = new CommentBoxEvent($comments, $group, $listType);
+		$event = new UserImageEvent($author);
+		$eventDispatcher->dispatch(NetlivaCommenterEvents::USER_IMAGE, $event);
+		return [
+			'id'    => $author->getId(),
+			'name'  => (string)$author,
+			'photo' => $event->getImage(),
+		];
+	}
+
+	public function commentBox($group, $options = [])
+	{
+		$options = array_merge([
+			'listType'      => 'default',
+			'collaborators' => true,
+		],$options);
+
+		$comments        = $this->em->getRepository('NetlivaCommentBundle:Comments')->findByGroup($group);
+		$eventDispatcher = $this->container->get('event_dispatcher');
+		$event           = new CommentBoxEvent($comments, $group, $options['listType']);
 		$eventDispatcher->dispatch(NetlivaCommenterEvents::COMMENT_BOX, $event);
 
 
 		return $this->twig->render("@NetlivaComment/comments.html.twig", array(
-			'group'      => $group,
-			'comments'   => $comments,
-			'listType'   => $listType,
-			'topContent' => $event->getTopContent(),
+			'group'         => $group,
+			'comments'      => $comments,
+			'collaborators' => $options['collaborators'] ? $this->prepareCollaborators($group) : [],
+			'options'       => $options,
+			'allAuthors'    => $this->prepareAllCollaborators(),
+			'topContent'    => $event->getTopContent(),
 		));
 
 

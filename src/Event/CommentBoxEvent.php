@@ -14,9 +14,9 @@ class CommentBoxEvent extends Event
 	 */
 	private $group;
 	/**
-	 * @var string
+	 * @var array
 	 */
-	private $listType;
+	private $options;
 	/**
 	 * @var string
 	 */
@@ -26,14 +26,14 @@ class CommentBoxEvent extends Event
 	 * CommentsTopContentEvent constructor.
 	 *
 	 * @param Comments[] $comments
-	 * @param string $group
-	 * @param string $listType
+	 * @param string     $group
+	 * @param array      $options
 	 */
-	public function __construct ($comments, $group, $listType) {
+	public function __construct ($comments, $group, $options) {
 
 		$this->comments = $comments;
-		$this->group = $group;
-		$this->listType = $listType;
+		$this->group    = $group;
+		$this->options  = $options;
 	}
 
 	public function getComments ()
@@ -50,11 +50,11 @@ class CommentBoxEvent extends Event
 	}
 
 	/**
-	 * @return string
+	 * @return array
 	 */
-	public function getListType (): string
+	public function getOptions (): array
 	{
-		return $this->listType;
+		return $this->options;
 	}
 
 	/**

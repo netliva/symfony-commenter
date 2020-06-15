@@ -92,3 +92,7 @@
 	padding: 0 15px 10px;
 	border-radius: 4px;
 }
+
+.netliva-show-old-comments-btn {
+	margin-top: -10px !important;
+}

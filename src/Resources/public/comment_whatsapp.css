@@ -33,11 +33,11 @@
 	border-radius:3px;
 }
 
-.netliva-send-comment-btn,
-.netliva-cancel-comment-btn
+div.comment-input-container > .netliva-send-comment-btn,
+div.comment-input-container > .netliva-cancel-comment-btn
 {
 	background:transparent !important;
-	color:gray;
+	color:gray !important;
 	font-size:23px;
 	height:auto;
 	border:0 !important;

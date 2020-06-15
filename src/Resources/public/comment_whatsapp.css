@@ -36,11 +36,11 @@
 .netliva-send-comment-btn,
 .netliva-cancel-comment-btn
 {
-	background:transparent;
+	background:transparent !important;
 	color:gray;
 	font-size:23px;
 	height:auto;
-	border:0;
+	border:0 !important;
 	margin:0;
 	padding:0
 }

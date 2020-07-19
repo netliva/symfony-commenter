@@ -56,6 +56,11 @@
 				commenter.create_comment_input();
 				commenter.load_comments();
 				commenter.initalize_collaborators();
+				commenter.area.find('.netliva-comment-input').focus(function () {
+					if (!commenter.area.hasClass('comment-input-focus')) commenter.area.addClass('comment-input-focus')
+				}).blur(function () {
+					if (commenter.area.hasClass('comment-input-focus')) commenter.area.removeClass('comment-input-focus')
+				});
 			},
 			stringToColour: function(str) {
 				var hash = 0, i;
@@ -141,6 +146,9 @@
 						else commenter.area.find("ul.netliva-comment-list").html(response.html);
 						commenter.update_show_btn();
 						commenter.area.find("ul.netliva-comment-list > li:not(.binded)").each(commenter.actions.comment_btns)
+
+						if (commenter.counts.total && commenter.area.hasClass("no-comment")) commenter.area.removeClass("no-comment");
+						else if (!commenter.counts.total && !commenter.area.hasClass("no-comment")) commenter.area.addClass("no-comment");
 					},
 				    complete: function () {
 					    commenter.area.find(".loader-block").remove();

@@ -1,5 +1,5 @@
 <div
-	class="netliva-comments-area comm-grp-{{group}} comm-type-{{options.listType}}"
+	class="netliva-comments-area comm-grp-{{group}} comm-type-{{options.listType}} {{ (comments and comments|length) ? "" : "no-comment" }}"
 	data-create-url="{{ path('netliva_symfony_comments_create') }}"
 	data-refresh-url="{{ path('netliva_symfony_comments_list', {"group": group, "listType": options.listType}) }}"
 	data-newcoll-url="{{ path('netliva_symfony_new_collaborators', {"group": group}) }}"

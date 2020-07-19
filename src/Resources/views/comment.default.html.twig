@@ -26,7 +26,7 @@
 						{% if row.history is iterable and row.history|length %}
 							<span class="px-1 netliva-comment-history"><i class="fa fa-history"></i></span>
 						{% endif %}
-						<em {{ (row.editAt ? 'class="tt-btn" title="Düzenlenme: '~row.editAt|date("d.m.Y_H:i")~'"')|raw}}>
+						<em {{ (row.editAt ? 'title="Düzenlenme: '~row.editAt|date("d.m.Y_H:i")~'"')|raw}}>
 							{{ row.addAt|date("d.m.Y - H:i") }}
 							{{ row.editor and row.editor.id != row.author.id ? " ("~row.editor.name~" düzenledi)":"" }}
 						</em>

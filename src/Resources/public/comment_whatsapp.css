@@ -26,13 +26,6 @@
 	z-index: 1;
 }
 
-.netliva-comment-input-area {
-	background: #efeff0;
-	margin: 0 -20px -20px;
-	padding: 15px;
-	border-radius:3px;
-}
-
 div.comment-input-container > .netliva-send-comment-btn,
 div.comment-input-container > .netliva-cancel-comment-btn
 {
@@ -86,13 +79,11 @@ div.comment-input-container > .netliva-cancel-comment-btn
 	right: 7px;
 	left: auto;
 }
-
-
-.netliva-comment-collaborators-area {
-	margin: 15px -20px -20px;
+.netliva-comment-footer-area {
 	background: #efeff0;
-	padding: 0 15px 10px;
-	border-radius: 4px;
+	margin: 0 -20px -20px;
+	padding: 15px;
+	border-radius:3px;
 }
 
 .netliva-show-old-comments-btn {

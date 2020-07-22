@@ -57,7 +57,7 @@ textarea.netliva-comment-input { margin-right: -30px; z-index: 2; transition: al
 
 
 /*** Yorum eklenmediyse, ufak modda güzüksün ***/
-.netliva-comment-list, .netliva-comment-input-area, .netliva-comment-collaborators-area, .netliva-comments-area.no-comment { transition: all 500ms; }
+.netliva-comment-list, .netliva-comment-input-area, .netliva-comment-collaborators-area, .netliva-comments-area.no-comment, .netliva-comment-footer-area { transition: all 500ms; }
 .netliva-comments-area.no-comment:not(.comment-input-focus) { padding:0; }
 .netliva-comments-area.no-comment:not(.comment-input-focus) .netliva-comment-collaborators-area { margin: 0; display: none; height:0; }
 .netliva-comments-area.no-comment:not(.comment-input-focus) .netliva-comment-footer-area { margin: 0; }

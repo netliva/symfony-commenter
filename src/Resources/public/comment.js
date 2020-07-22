@@ -185,8 +185,12 @@
 						commenter.load_comments("over");
 						$input.val("").prop("disabled",false);
 
-						commenter.settings.users.push(commenter.settings.my_user);
-						commenter.prepare_collaborators();
+						// kullanıcı yoksa ekle
+						if (!commenter.settings.users.find(function (user) { return user.id === commenter.settings.my_user.id }))
+						{
+							commenter.settings.users.push(commenter.settings.my_user);
+							commenter.prepare_collaborators();
+						}
 
 					},
 					error: function (response) {

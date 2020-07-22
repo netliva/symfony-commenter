@@ -5,6 +5,7 @@ namespace Netliva\CommentBundle\Controller;
 use Doctrine\ORM\EntityManager;
 use Netliva\CommentBundle\Entity\Comments;
 use Netliva\CommentBundle\Entity\CommentsGroupInfo;
+use Netliva\CommentBundle\Event\AfterAddCollaboratorsEvent;
 use Netliva\CommentBundle\Event\AfterAddCommentEvent;
 use Netliva\CommentBundle\Event\NetlivaCommenterEvents;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -137,6 +138,13 @@ class CommentsController extends Controller
 	public function createCollaboratorsAction (Request $request, $group)
 	{
 		$collaborators = $this->addCollaborators($group, $request->request->get('author'));
+		$em = $this->getDoctrine()->getManager();
+
+
+		$eventDispatcher = $this->get('event_dispatcher');
+		$event = new AfterAddCollaboratorsEvent($em->getRepository('NetlivaCommentBundle:AuthorInterface')->find($request->request->get('author')), $collaborators, $group);
+		$eventDispatcher->dispatch(NetlivaCommenterEvents::AFTER_ADD_COLLABORATOR, $event);
+
 
 		return new JsonResponse( ["situ" => "success"] );
 	}

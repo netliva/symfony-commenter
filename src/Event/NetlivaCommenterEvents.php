@@ -12,6 +12,13 @@ final class NetlivaCommenterEvents
 	const  AFTER_ADD = 'netliva_commenter.after_add';
 
 	/**
+	 * Katılımcı eklendikten sonra çalışır
+	 *
+	 * @Event("Netliva\CommentBundle\Event\AfterAddCollaboratorsEvent")
+	 */
+	const  AFTER_ADD_COLLABORATOR = 'netliva_commenter.after_add_collaborator';
+
+	/**
 	 * Yorum eklendikten sonra çalışır
 	 *
 	 * @Event(Netliva\CommentBundle\Event\CommentBoxEvent")

@@ -357,6 +357,7 @@
 						commenter.show_history($(this).closest("li"));
 						return false;
 					});
+					$(document).trigger('netliva:commenter:initline', [$(this), commenter])
 				},
 				show_comment: function () {
 					var $btn = commenter.area.find(commenter.e.show_old_btn);

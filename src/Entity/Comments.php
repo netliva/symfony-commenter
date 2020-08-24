@@ -78,6 +78,22 @@ class Comments
     private $editor;
 
 	/**
+	 * @var \Doctrine\Common\Collections\Collection
+	 *
+	 * @ORM\OneToMany(targetEntity="Netliva\CommentBundle\Entity\Comments", mappedBy="answerTo", cascade={"persist", "remove"})
+	 */
+	private $answers;
+
+	/**
+	 * @var Comments
+	 *
+	 * @ORM\ManyToOne(targetEntity="Netliva\CommentBundle\Entity\Comments", inversedBy="answers")
+	 * @ORM\JoinColumn(nullable=true)
+	 */
+	private $answerTo;
+
+
+	/**
 	 * @return int
 	 */
 	public function getId (): int
@@ -236,6 +252,38 @@ class Comments
 	public function setAuthorStr (string $author_str): void
 	{
 		$this->author_str = $author_str;
+	}
+
+	/**
+	 * @return \Doctrine\Common\Collections\Collection
+	 */
+	public function getAnswers (): \Doctrine\Common\Collections\Collection
+	{
+		return $this->answers;
+	}
+
+	/**
+	 * @param \Doctrine\Common\Collections\Collection $answers
+	 */
+	public function setAnswers (\Doctrine\Common\Collections\Collection $answers): void
+	{
+		$this->answers = $answers;
+	}
+
+	/**
+	 * @return Comments
+	 */
+	public function getAnswerTo (): ?Comments
+	{
+		return $this->answerTo;
+	}
+
+	/**
+	 * @param Comments $answerTo
+	 */
+	public function setAnswerTo (Comments $answerTo): void
+	{
+		$this->answerTo = $answerTo;
 	}
 
 

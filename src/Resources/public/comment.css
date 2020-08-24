@@ -65,6 +65,12 @@ textarea.netliva-comment-input { margin-right: -30px; z-index: 2; transition: al
 
 
 
+/*** Yanıt Css ***/
+.netliva-answer-comment {display: block;font-size: 0.8rem;background: rgba(30,30,30,0.1);padding: 5px 6px;border-radius: 3px;border-left: 3px solid #3498db;}
+.netliva-answer-comment .ntlv_user_name {display: block;}
+.netliva-answer-comment em {font-size: 0.6rem;}
+
+
 /** Katılımcılar **/
 
 .netliva-comment-collaborators-area,

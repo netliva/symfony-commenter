@@ -21,6 +21,15 @@
 				{% endif %}
 				<p>
 					<strong class="ntlv_user_name">{{row.author ? row.author : (row.authorStr ? row.authorStr : 'Bilinmiyor') }}</strong>
+					{% if row.answerTo %}
+						<span class="netliva-answer-comment">
+							<strong class="ntlv_user_name">{{row.answerTo.author ? row.answerTo.author : (row.answerTo.authorStr ? row.answerTo.authorStr : 'Bilinmiyor') }}</strong>
+							{{ row.answerTo.comment|nl2br }}
+							<small>
+								<em>{{ row.answerTo.addAt|date("d.m.Y - H:i") }}</em>
+							</small>
+						</span>
+					{% endif %}
 					{{ row.comment|nl2br }}
 					<small>
 						{% if row.history is iterable and row.history|length %}

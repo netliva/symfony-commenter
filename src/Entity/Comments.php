@@ -42,6 +42,13 @@ class Comments
     private $addAt;
 
 	/**
+	 * @var string
+	 *
+	 * @ORM\Column(type="string", length=255)
+	 */
+	private $author_str;
+
+	/**
 	 * @var AuthorInterface
 	 *
 	 * @ORM\ManyToOne(targetEntity="AuthorInterface")
@@ -146,7 +153,7 @@ class Comments
 	/**
 	 * @return AuthorInterface
 	 */
-	public function getAuthor (): AuthorInterface
+	public function getAuthor (): ?AuthorInterface
 	{
 		return $this->author;
 	}
@@ -213,6 +220,22 @@ class Comments
 		$this->editor = $editor;
 
 		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getAuthorStr (): string
+	{
+		return $this->author_str;
+	}
+
+	/**
+	 * @param string $author_str
+	 */
+	public function setAuthorStr (string $author_str): void
+	{
+		$this->author_str = $author_str;
 	}
 
 

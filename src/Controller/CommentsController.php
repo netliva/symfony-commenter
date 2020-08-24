@@ -93,6 +93,7 @@ class CommentsController extends Controller
 		}
 
 		$entity->setAddAt(new \DateTime());
+		$entity->setAuthorStr($this->getUser());
 		$entity->setAuthor($this->getUser());
 		$entity->setGroup($group);
 		$entity->setComment($comment);

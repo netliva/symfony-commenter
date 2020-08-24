@@ -1,7 +1,7 @@
 
 	{% for row in comments %}
 		<li
-			class="netliva-comments-line {{ app.user.id == row.author.id ? "netliva-my-comment" }}"
+			class="netliva-comments-line {{ row.author and  app.user.id == row.author.id ? "netliva-my-comment" }}"
 			data-id="{{row.id}}"
 			data-comment="{{row.comment}}"
 			data-comment-id="{{row.id}}"
@@ -10,7 +10,7 @@
 			data-history-url="{{path("netliva_symfony_comments_history",{id:row.id })}}"
 		>
 			<div class="netliva-a-comment">
-				{% if app.user.id == row.author.id %}
+				{% if row.author and  app.user.id == row.author.id %}
 					<div class="text-left dropdown">
 						<a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false"></a>
 						<div class="dropdown-menu">
@@ -20,7 +20,7 @@
 					</div>
 				{% endif %}
 				<p>
-					<strong class="ntlv_user_name">{{row.author }}</strong>
+					<strong class="ntlv_user_name">{{row.author ? row.author : (row.authorStr ? row.authorStr : 'Bilinmiyor') }}</strong>
 					{{ row.comment|nl2br }}
 					<small>
 						{% if row.history is iterable and row.history|length %}
@@ -28,7 +28,7 @@
 						{% endif %}
 						<em {{ (row.editAt ? 'title="Düzenlenme: '~row.editAt|date("d.m.Y_H:i")~'"')|raw}}>
 							{{ row.addAt|date("d.m.Y - H:i") }}
-							{{ row.editor and row.editor.id != row.author.id ? " ("~row.editor.name~" düzenledi)":"" }}
+							{{ row.editor and (not row.author or row.editor.id != row.author.id) ? " ("~row.editor.name~" düzenledi)":"" }}
 						</em>
 					</small>
 				</p>

@@ -348,7 +348,20 @@
 						var color = commenter.stringToColour($(this).text());
 						$(this).css("color", color);
 						if ($(this).parent().hasClass('netliva-answer-comment'))
-							$(this).parent().css('border-color', color)
+						{
+							$(this).parent().css('border-color', color);
+							$(this).parent().click(function(){
+								$(this).css('max-height', 300);
+								var e = $(this).css('max-height', 300);
+								setTimeout(function () {
+									e.removeClass('answer-overflow');
+									e.css('max-height', 'none');
+								},300);
+							}).hover(function(){
+								if ($(this).outerHeight() < $(this).prop('scrollHeight') && !$(this).hasClass("answer-overflow"))
+									$(this).addClass('answer-overflow');
+							});
+						}
 					});
 					$(this).find(".netliva-comment-edit-btn").click(function(){
 						commenter.update_comment($(this).closest("li"));

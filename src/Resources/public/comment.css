@@ -66,10 +66,20 @@ textarea.netliva-comment-input { margin-right: -30px; z-index: 2; transition: al
 
 
 /*** Yanıt Css ***/
-.netliva-answer-comment {display: block;font-size: 0.8rem;background: rgba(30,30,30,0.1);padding: 5px 6px;border-radius: 3px;border-left: 3px solid #3498db;}
+.netliva-answer-comment {display: block;font-size: 0.8rem;background: rgba(30,30,30,0.1);padding: 5px 6px;border-radius: 3px;border-left: 3px solid #3498db; max-height: 70px;overflow: hidden;}
 .netliva-answer-comment .ntlv_user_name {display: block;}
 .netliva-answer-comment em {font-size: 0.6rem;}
 
+.netliva-answer-comment {
+	background: radial-gradient(farthest-side at 50% 100%, rgba(0,0,0,0.3) 30%, transparent) no-repeat center bottom rgba(30,30,30,0.1);
+	background-size: 100% 0;
+	transition: 300ms all;
+}
+.netliva-answer-comment.answer-overflow {
+	background-size: 100% 0;
+	cursor: pointer;
+}
+.netliva-answer-comment.answer-overflow:hover {max-height: 75px; background-size: 100% 15px; }
 
 /** Katılımcılar **/
 

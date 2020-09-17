@@ -1,7 +1,14 @@
 
+	{% set prev = null %}
+	{% set prev_id = null %}
 	{% for row in comments %}
 		<li
-			class="netliva-comments-line {{ row.author and  app.user.id == row.author.id ? "netliva-my-comment" }}"
+			class="netliva-comments-line
+					{{ row.author and app.user.id == row.author.id ? "netliva-my-comment" }}
+					{{ (row.author and prev == row.author.id) ? "netliva-continues-comment" }}
+					{{ row.answerTo ? "netliva-answer-comment-line" }}
+					{{ row.answerTo and row.answerTo.id == prev_id ? "netliva-answer-to-prev" }}
+				  "
 			data-id="{{row.id}}"
 			data-comment="{{row.comment}}"
 			data-comment-id="{{row.id}}"
@@ -9,6 +16,8 @@
 			data-update-url="{{path("netliva_symfony_comments_update",{id:row.id, viewtype:"default" })}}"
 			data-history-url="{{path("netliva_symfony_comments_history",{id:row.id })}}"
 		>
+			{% set prev = row.author ? row.author.id : null %}
+			{% set prev_id = row.id %}
 			<div class="netliva-a-comment">
 				{% if row.author and  app.user.id == row.author.id %}
 					<div class="text-left dropdown">

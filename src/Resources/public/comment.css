@@ -56,6 +56,12 @@ textarea.netliva-comment-input { margin-right: -30px; z-index: 2; transition: al
 .netliva-comments-line small { opacity: 0.6 }
 
 
+/*** Ön tanımlı cevaplar ***/
+.predefined-texts-area {position: absolute;bottom: 38px;z-index: 5;background: white;list-style: none;margin:0;padding:3px;border: 1px solid #ddd;border-radius: 3px;display: none;}
+.predefined-texts-area li {padding: 4px 10px;min-width: 150px;border-radius: 2px;cursor: pointer;}
+.predefined-texts-area li:hover {background: #65a6ff;}
+.comment-input-container {position: relative;}
+
 /*** Yorum eklenmediyse, ufak modda güzüksün ***/
 .netliva-comment-list, .netliva-comment-input-area, .netliva-comment-collaborators-area, .netliva-comments-area.no-comment, .netliva-comment-footer-area { transition: all 500ms; }
 .netliva-comments-area.no-comment:not(.comment-input-focus) { padding:0; }

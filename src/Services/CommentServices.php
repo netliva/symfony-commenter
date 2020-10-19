@@ -8,8 +8,8 @@ use Netliva\CommentBundle\Event\UserImageEvent;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Twig\Environment;
 use Twig\Extension\AbstractExtension;
-use Twig\TwigFunction;
 use Twig\TwigFilter;
+use Twig\TwigFunction;
 
 class CommentServices extends AbstractExtension
 {
@@ -96,9 +96,10 @@ class CommentServices extends AbstractExtension
 	public function commentBox($group, $options = [])
 	{
 		$options = array_merge([
-			'listType'      => 'default',
-			'collaborators' => true,
-		],$options);
+		   'listType'         => 'default',
+		   'predefined_texts' => [],
+		   'collaborators'    => true,
+	    ],$options);
 
 		$comments        = $this->em->getRepository('NetlivaCommentBundle:Comments')->findByGroup($group);
 		$eventDispatcher = $this->container->get('event_dispatcher');

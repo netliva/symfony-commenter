@@ -1,29 +1,15 @@
 
 .netliva-comments-area {
-	background-color: #e5ddd5;
+	background:url(chatbg_o.png) #e5ddd5;
 	padding: 20px;
 	position: relative;
 	border-radius:3px;
 }
 .netliva-comments-area > * {
-	z-index: 2 !important;
 	position: relative;
 }
 .netliva-comments-area > ul {
-	z-index: 3 !important;
 	position: relative;
-}
-.netliva-comments-area:after {
-	content: "";
-	position: absolute;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	top: 0;
-	display: block;
-	background: url(chatbg.png);
-	opacity: .06;
-	z-index: 1;
 }
 
 div.comment-input-container > .netliva-send-comment-btn,

@@ -7,6 +7,7 @@
 	data-my-user="{{ app.user|prepareCollaboratorsObject|json_encode }}"
 	data-my-user="{{ app.user|prepareCollaboratorsObject|json_encode }}"
 	data-group="{{ group }}"
+	data-predefined-texts="{{options.predefined_texts|json_encode}}"
 >
 	{{ topContent|raw }}
 	<div class="text-center"><button class="netliva-show-old-comments-btn btn-sm btn btn-link mt-2">{# Eski yorumları yüklenme butonu #}</button></div>

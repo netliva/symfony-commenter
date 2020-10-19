@@ -7,6 +7,7 @@
 			create_url: $(this).data("createUrl"),
 			refresh_url: $(this).data("refreshUrl"),
 			new_coll_url: $(this).data("newcollUrl"),
+			predefined_texts: $(this).data("predefinedTexts"),
 			removeme_url: $(this).data("removemeUrl"),
 			my_user: $(this).data("myUser")
 		}, settings);
@@ -15,13 +16,14 @@
 			// ===============
 			area: null,
 			settings : {
-				create_url   : null,
-				new_coll_url : null,
-				removeme_url : null,
-				refresh_url  : null,
-				users        : null,
-				all_users    : null,
-				my_user      : null
+				create_url       : null,
+				new_coll_url     : null,
+				removeme_url     : null,
+				refresh_url      : null,
+				users            : null,
+				all_users        : null,
+				my_user          : null,
+				predefined_texts : null,
 			},
 			counts: {
 				limit: 5,
@@ -38,6 +40,7 @@
 			},
 			t : {
 				input: '<div class="d-flex comment-input-container">\
+						<ul class="predefined-texts-area"></ul>\
 						<textarea class="form-control netliva-comment-input" rows="1" placeholder="Yorum"></textarea>\
 						<button class="btn btn-xs btn-success netliva-send-comment-btn"><i class="fa fa-paper-plane"></i></button>\
 					</div>\
@@ -58,8 +61,13 @@
 				commenter.initalize_collaborators();
 				commenter.area.find('.netliva-comment-input').focus(function () {
 					if (!commenter.area.hasClass('comment-input-focus')) commenter.area.addClass('comment-input-focus')
+					commenter.actions.pta.show();
 				}).blur(function () {
 					if (commenter.area.hasClass('comment-input-focus')) commenter.area.removeClass('comment-input-focus')
+					setTimeout(function () {
+						if (!commenter.area.hasClass('comment-input-focus'))
+							commenter.actions.pta.hide();
+					}, 300);
 				});
 			},
 			stringToColour: function(str) {
@@ -124,8 +132,12 @@
 			},
 			create_comment_input: function () {
 				$input_conainer = $(commenter.t.input);
-				$input_conainer.find('textarea').keydown(this.actions.autosize).keydown(this.actions.enter_send)
+				$input_conainer.find('textarea').keydown(this.actions.autosize).keydown(this.actions.enter_send).keyup(this.actions.pta.control_visibility);
 				$input_conainer.find("button").click(this.actions.send);
+				$.each(this.settings.predefined_texts, function (key, text) {
+					$input_conainer.find(".predefined-texts-area").append('<li>'+text+'</li>');
+				})
+				$input_conainer.find(".predefined-texts-area li").click(this.actions.send_predefined_text);
 				this.area.find(commenter.e.input_area).append($input_conainer);
 			},
 			load_comments: function (position)
@@ -165,7 +177,7 @@
 					else $btn.show().html('Eski Yorumları Göster ('+(commenter.counts.total-commenter.counts.loaded)+' adet mevcut)');
 				},1000);
 			},
-			send: function ($comment_area) {
+			send: function ($comment_area, after_focus) {
 				var $input = $comment_area.find("textarea");
 				$input.prop("disabled",true);
 				$input.before(commenter.loaders.ring);
@@ -199,7 +211,7 @@
 					},
 					complete: function () {
 						commenter.area.find(".netliva-lds-ring").remove();
-						$input.focus();
+						if (after_focus) $input.focus();
 					}
 				});
 			},
@@ -306,10 +318,25 @@
 				})
 			},
 			actions: {
+				pta: {
+					control_visibility: function () {
+						if (commenter.area.find(commenter.e.input_area).find('textarea').val())
+							commenter.actions.pta.hide();
+						else
+							commenter.actions.pta.show();
+					},
+					show: function () {
+						if (commenter.area.find('.predefined-texts-area li').length)
+							commenter.area.find('.predefined-texts-area').show();
+					},
+					hide: function () {
+							commenter.area.find('.predefined-texts-area').hide();
+					},
+				},
 				enter_send: function (e) {
 					if(e.which === 13 && !e.shiftKey)
 					{
-						commenter.send($(this).closest(".comment-input-container"));
+						commenter.send($(this).closest(".comment-input-container"), true);
 						return false;
 					}
 				},
@@ -321,7 +348,13 @@
 					},0);
 				},
 				send: function () {
-					commenter.send($(this).closest(".comment-input-container"))
+					commenter.send($(this).closest(".comment-input-container"), true)
+				},
+				send_predefined_text: function ()
+				{
+					commenter.area.find(commenter.e.input_area).find('textarea').val($(this).text());
+					commenter.send($(this).closest(".comment-input-container"), false);
+					commenter.actions.pta.hide();
 				},
 				update: function () {
 					commenter.update($(this).closest("li"))
@@ -470,7 +503,7 @@
 						}
 					});
 
-				},
+				}
 			},
 			modal: {
 				open: function (options){

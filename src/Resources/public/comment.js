@@ -69,6 +69,7 @@
 							commenter.actions.pta.hide();
 					}, 300);
 				});
+				$(document).trigger('netliva:commenter:init', [area, commenter])
 			},
 			stringToColour: function(str) {
 				var hash = 0, i;

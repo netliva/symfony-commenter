@@ -63,11 +63,13 @@
 					if (!commenter.area.hasClass('comment-input-focus')) commenter.area.addClass('comment-input-focus')
 					commenter.actions.pta.show();
 				}).blur(function () {
-					if (commenter.area.hasClass('comment-input-focus')) commenter.area.removeClass('comment-input-focus')
 					setTimeout(function () {
-						if (!commenter.area.hasClass('comment-input-focus'))
-							commenter.actions.pta.hide();
-					}, 300);
+						if (commenter.area.hasClass('comment-input-focus')) commenter.area.removeClass('comment-input-focus')
+						setTimeout(function () {
+							if (!commenter.area.hasClass('comment-input-focus'))
+								commenter.actions.pta.hide();
+						}, 300);
+					}, 100);
 				});
 				$(document).trigger('netliva:commenter:init', [area, commenter])
 			},

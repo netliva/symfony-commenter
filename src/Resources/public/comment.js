@@ -181,6 +181,7 @@
 				},1000);
 			},
 			send: function ($comment_area, after_focus) {
+				$(document).trigger('netliva:commenter:send:click', [$comment_area, commenter]);
 				var $input = $comment_area.find("textarea");
 				$input.prop("disabled",true);
 				$input.before(commenter.loaders.ring);
@@ -191,8 +192,9 @@
 						group   : commenter.area.data("group"),
 					},
 					dataType:"json", type:"post",
-					success:function(response)
+					success:function(response,  textStatus, jqXHR)
 					{
+						$(document).trigger('netliva:commenter:send:success', [$comment_area, response,  textStatus, jqXHR, commenter]);
 						commenter.counts.limit   = 5;
 						commenter.counts.loaded  = 0;
 						commenter.counts.total   = 0;
@@ -208,11 +210,13 @@
 						}
 
 					},
-					error: function (response) {
-						commenter.show_error(response);
+					error: function (jqXHR, textStatus) {
+						$(document).trigger('netliva:commenter:send:error', [$comment_area, jqXHR, textStatus, commenter]);
+						commenter.show_error(jqXHR);
 						$input.prop("disabled",false);
 					},
-					complete: function () {
+					complete: function (jqXHR, textStatus) {
+						$(document).trigger('netliva:commenter:send:complete', [$comment_area, jqXHR, textStatus, commenter]);
 						commenter.area.find(".netliva-lds-ring").remove();
 						if (after_focus) $input.focus();
 					}
@@ -411,7 +415,7 @@
 						commenter.show_history($(this).closest("li"));
 						return false;
 					});
-					$(document).trigger('netliva:commenter:initline', [$(this), commenter])
+					$(document).trigger('netliva:commenter:initline', [$(this), commenter]);
 				},
 				show_comment: function () {
 					var $btn = commenter.area.find(commenter.e.show_old_btn);

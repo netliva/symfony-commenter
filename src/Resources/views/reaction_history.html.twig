@@ -1,0 +1,16 @@
+<table class="table table-striped">
+	<tbody>
+	{% for reaction in reactions %}
+		<tr>
+			<td>{{ reaction.addBy ? reaction.addBy : reaction.addByStr }}</td>
+			<td>
+				<span class="nc-reactions-button-emo">{{ reaction.reaction and emotions[reaction.reaction] is defined ? emotions[reaction.reaction].emoji : '👍' }}</span>
+				<span class="nc-reactions-button-text" style="color: {{ reaction.reaction and emotions[reaction.reaction] is defined ? emotions[reaction.reaction].color : "#666" }}">
+					{{ reaction.reaction and emotions[reaction.reaction] is defined ? emotions[reaction.reaction].desc : "İfade Bırak" }}
+				</span>
+			</td>
+			<td>{{ reaction.addAt|date("d.m.Y H:i") }}</td>
+		</tr>
+	{% endfor %}
+	</tbody>
+</table>

@@ -80,6 +80,13 @@ class Comments
 	/**
 	 * @var \Doctrine\Common\Collections\Collection
 	 *
+	 * @ORM\OneToMany(targetEntity="Netliva\CommentBundle\Entity\Reactions", mappedBy="comment", cascade={"persist", "remove"})
+	 */
+	private $reactions;
+
+	/**
+	 * @var \Doctrine\Common\Collections\Collection
+	 *
 	 * @ORM\OneToMany(targetEntity="Netliva\CommentBundle\Entity\Comments", mappedBy="answerTo", cascade={"persist", "remove"})
 	 */
 	private $answers;
@@ -257,6 +264,35 @@ class Comments
 	/**
 	 * @return \Doctrine\Common\Collections\Collection
 	 */
+	public function getReactions (): \Doctrine\Common\Collections\Collection
+	{
+		return $this->reactions;
+	}
+
+	/**
+	 * @param \Doctrine\Common\Collections\Collection $reactions
+	 */
+	public function seReactions (\Doctrine\Common\Collections\Collection $reactions): void
+	{
+		$this->reactions = $reactions;
+	}
+
+	/**
+	 * @param Reactions $reaction
+	 *
+	 * @return $this
+	 */
+	public function addReaction(Reactions $reaction) : self
+	{
+		if($this->reactions->contains($reaction)) return $this;
+		$this->reactions[] = $reaction;
+		$reaction->setComment($this);
+		return $this;
+	}
+
+	/**
+	 * @return \Doctrine\Common\Collections\Collection
+	 */
 	public function getAnswers (): \Doctrine\Common\Collections\Collection
 	{
 		return $this->answers;
@@ -268,6 +304,14 @@ class Comments
 	public function setAnswers (\Doctrine\Common\Collections\Collection $answers): void
 	{
 		$this->answers = $answers;
+	}
+
+	public function addAnswer(Comments $answer)
+	{
+		if($this->answers->contains($answer)) return $this;
+		$this->answers[] = $answer;
+		$answer->setAnswerTo($this);
+		return $this;
 	}
 
 	/**

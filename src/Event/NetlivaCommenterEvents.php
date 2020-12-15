@@ -26,6 +26,13 @@ final class NetlivaCommenterEvents
 	const  COMMENT_BOX = 'netliva_commenter.comment_box';
 
 	/**
+	 * İfade bıraktıktan sonra çalışır
+	 *
+	 * @Event(Netliva\CommentBundle\Event\AfterAddReactionEvent")
+	 */
+	const  AFTER_REACTION = 'netliva_commenter.after_reaction';
+
+	/**
 	 * Kullanıcının profil fotoğrafına ulaşmak istendiğinde kullanılır
 	 *
 	 * @Event(Netliva\CommentBundle\Event\UserImageEvent")

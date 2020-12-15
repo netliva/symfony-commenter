@@ -31,3 +31,11 @@ netliva_symfony_comments_delete:
     defaults: { _controller: NetlivaCommentBundle:Comments:delete }
     methods: [POST, DELETE]
 
+netliva_symfony_reaction_add:
+    path:     /comments/reaction/add/{id}
+    defaults: { _controller: NetlivaCommentBundle:Reactions:add }
+    methods: [POST]
+netliva_symfony_reaction_history:
+    path:     /comments/reaction/history/{id}
+    defaults: { _controller: NetlivaCommentBundle:Reactions:history }
+    methods: [POST]

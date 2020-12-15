@@ -31,21 +31,21 @@ div.comment-input-container > .netliva-cancel-comment-btn
 	padding:5px 7px 5px 5px;
 	width:48px
 }
-.netliva-comments-line p  {
+.netliva-comments-line div.nc-bubble  {
 	font-size: 12px;
 	max-width: 95%;
 }
-.netliva-comments-line.netliva-my-comment p {
+.netliva-comments-line.netliva-my-comment div.nc-bubble {
 
 	background: #dcf8c6;
 }
-.netliva-comments-line.netliva-my-comment p::after {
+.netliva-comments-line.netliva-my-comment div.nc-bubble::after {
 	border-color: transparent transparent transparent #dcf8c6 !important;
 }
-.netliva-comments-line p::after {
+.netliva-comments-line div.nc-bubble::after {
 	border-color: transparent white transparent transparent !important;
 }
-.netliva-comments-line p {
+.netliva-comments-line div.nc-bubble {
 	background-color: white;
 	box-shadow: 0 1px .5px rgba(0,0,0,.13);
 }

@@ -1,0 +1,20 @@
+<div class="nc-reactions-line">
+
+	<div class="nc-reactions-stat" data-emotions="{{ emo_counts|json_encode }}"></div>
+
+	<div class="nc-reactions-button"
+		 data-comment-id="{{ comment.id }}"
+		 data-add-url="{{ path('netliva_symfony_reaction_add', {'id': comment.id}) }}"
+		 data-history-url="{{ path('netliva_symfony_reaction_history', {'id': comment.id}) }}"
+	>
+		<span class="nc-reactions-button-emo">{{ my_last_react and emotions[my_last_react] is defined ? emotions[my_last_react].emoji : def_emo }}</span>
+		<span class="nc-reactions-button-text" style="color: {{ my_last_react and emotions[my_last_react] is defined ? emotions[my_last_react].color : "#666" }}">
+			{{ my_last_react and emotions[my_last_react] is defined ? emotions[my_last_react].desc : "İfade Bırak" }}
+		</span>
+		<ul class="nc-reactions-box">
+			{% for emoKey, emoInfo in emotions %}
+				<li class="nc-reaction" data-emo-key="{{ emoKey }}" data-reaction="{{ emoInfo.desc }}">{{ emoInfo.emoji }}</li>
+			{% endfor %}
+		</ul>
+	</div>
+</div>

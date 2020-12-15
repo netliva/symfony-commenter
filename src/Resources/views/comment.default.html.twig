@@ -28,7 +28,7 @@
 						</div>
 					</div>
 				{% endif %}
-				<p>
+				<div class="nc-bubble">
 					<strong class="ntlv_user_name">{{row.author ? row.author : (row.authorStr ? row.authorStr : 'Bilinmiyor') }}</strong>
 					{% if row.answerTo %}
 						<span class="netliva-answer-comment">
@@ -49,8 +49,10 @@
 							{{ row.editor and (not row.author or row.editor.id != row.author.id) ? " ("~row.editor.name~" düzenledi)":"" }}
 						</em>
 					</small>
-				</p>
-
+					{% if options.reactions %}
+						{{ reaction_button(row) }}
+					{% endif %}
+				</div>
 			</div>
 		</li>
 	{% endfor %}

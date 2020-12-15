@@ -18,7 +18,7 @@ use function Doctrine\ORM\QueryBuilder;
  */
 class CommentsController extends Controller
 {
-	public function listAction($group, $listType, $limitId, $limit)
+	public function listAction($group, $listType, $limitId, $limit, Request $request)
 	{
 		/** @var EntityManager $em */
 		$em = $this->getDoctrine()->getManager();
@@ -56,8 +56,9 @@ class CommentsController extends Controller
 		if ($count)
 		{
 			$html = $this->renderView('@NetlivaComment/comment.'.$listType.'.html.twig', array(
-				'group' => $group,
+				'group'    => $group,
 				'comments' => $comments,
+				'options'  => $request->request->get('options'),
 			));
 		}
 		else

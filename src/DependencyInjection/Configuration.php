@@ -18,11 +18,32 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root(' commenter');
+        $rootNode = $treeBuilder->root(' netliva_comment');
 
-        // Here you should define the parameters that are allowed to
-        // configure your bundle. See the documentation linked above for
-        // more information on that topic.
+		$rootNode
+			->children()
+				->scalarNode('default_emotion')
+					->defaultValue('👍')
+				->end()
+				->arrayNode('emotions')
+					->prototype('array')
+						->children()
+							->scalarNode('emoji')->end()
+							->scalarNode('desc')->end()
+							->scalarNode('color')->end()
+						->end()
+					->end()
+					->defaultValue([
+						'like'  => ['emoji' => '👍🏼', 'color'=>'#8A6749', 'desc' => 'Beğen'],
+						'love'  => ['emoji' => '❤️',  'color'=>'#DD2E44', 'desc' => 'Muhteşem'],
+						'haha'  => ['emoji' => '😂', 'color'=>'#DD9E00', 'desc' => 'Hahaha'],
+						'wow'   => ['emoji' => '😮', 'color'=>'#DD9E00', 'desc' => 'İnanılmaz'],
+						'sad'   => ['emoji' => '😔', 'color'=>'#DD9E00', 'desc' => 'Üzgün'],
+						'angry' => ['emoji' => '😡', 'color'=>'#DA2F47', 'desc' => 'Kızgın'],
+					])
+				->end()
+			->end()
+		;
 
         return $treeBuilder;
     }

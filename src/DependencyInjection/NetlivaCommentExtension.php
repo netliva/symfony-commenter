@@ -22,7 +22,10 @@ class NetlivaCommentExtension extends Extension
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+		$container->setParameter('netliva_commenter.emotions', $config['emotions']);
+		$container->setParameter('netliva_commenter.default_emotion', $config['default_emotion']);
+
+		$loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
     }
 }

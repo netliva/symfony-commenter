@@ -9,7 +9,10 @@
 			new_coll_url: $(this).data("newcollUrl"),
 			predefined_texts: $(this).data("predefinedTexts"),
 			removeme_url: $(this).data("removemeUrl"),
-			my_user: $(this).data("myUser")
+			my_user: $(this).data("myUser"),
+			options: $(this).data("options"),
+			emotions: $(this).data("emotions"),
+			default_emotion: $(this).data("defaultEmotion")
 		}, settings);
 
 		var commenter = {
@@ -23,7 +26,10 @@
 				users            : null,
 				all_users        : null,
 				my_user          : null,
+				options          : null,
 				predefined_texts : null,
+				emotions         : null,
+				default_emotion  : null,
 			},
 			counts: {
 				limit: 5,
@@ -152,7 +158,7 @@
 				else commenter.area.find("ul.netliva-comment-list").append("<li class='text-center loader-block'>"+commenter.loaders.blocks+"</li>");
 
 				$.ajax({
-					url:commenter.settings.refresh_url+"/"+commenter.counts.limit+"/"+commenter.counts.last_id, dataType: "json", type: "post",
+					url:commenter.settings.refresh_url+"/"+commenter.counts.limit+"/"+commenter.counts.last_id, dataType: "json", type: "post", data: {options: commenter.settings.options},
 					success: function (response) {
 						commenter.counts.loaded += response.count;
 						commenter.counts.total   = response.total;
@@ -227,6 +233,79 @@
 				commenter.modal.open({
 					title: "Yorum Geçmişi",
 					ajax: {url:$line.data("historyUrl")},
+				});
+			},
+			reaction_initialize: function ($BtnLine)
+			{
+				var $statsArea = $BtnLine.find('.nc-reactions-stat');
+				var emosh = $statsArea.data('emotions');
+				var $ul = $('<ul></ul>')
+				var total = 0;
+				$.each(emosh, function (emo, count) {
+					if (typeof commenter.settings.emotions[emo] !== 'undefined' )
+					{
+						total += count;
+						$ul.append('<li>'+commenter.settings.emotions[emo].emoji+'</li>');
+					}
+				});
+				$statsArea.html("");
+				if (total)
+				{
+					$ul.append('<li class="total_info">'+total+'</li>');
+					$ul.click(function () {
+						commenter.modal.open({
+							title: "İfadeler",
+							ajax: {url:$BtnLine.find('.nc-reactions-button').data("historyUrl")},
+						});
+					});
+					$ul.appendTo($statsArea);
+				}
+			},
+			reaction_buttons: function ($btnArea)
+			{
+				var commentId = $btnArea.data('commentId')
+				var url = $btnArea.data('addUrl')
+				$btnArea.hover(function () {
+					$(this).find('.nc-reactions-box').css('left', "-"+($(this).find('.nc-reactions-box').width()/3)+"px");
+				})
+				$btnArea.find(".nc-reaction").click(function(){
+					var emoKey = $(this).data("emoKey");
+					var emoTex = $(this).data("reaction");
+					$btnArea.find(".nc-reactions-button-text").append(commenter.loaders.ring);
+					$.ajax({
+						url:url, data:{reaction: emoKey}, dataType: "json", type: "post",
+						success: function (response) {
+							$btnArea.find(".netliva-lds-ring").remove();
+							if (response.type == 'remove')
+							{
+								$btnArea.find(".nc-reactions-button-emo").text(commenter.settings.default_emotion);
+								$btnArea.find(".nc-reactions-button-text").text('İfade Bırak').css('color', '#666');
+							}
+							else
+							{
+								if (typeof commenter.settings.emotions[emoKey] !== 'undefined' )
+								{
+									$btnArea.find(".nc-reactions-button-emo").text(commenter.settings.emotions[emoKey].emoji);
+									$btnArea.find(".nc-reactions-button-text").text(emoTex).css('color', commenter.settings.emotions[emoKey].color);
+								}
+							}
+							$btnArea.closest('.nc-reactions-line').find('.nc-reactions-stat').data('emotions', response.counts);
+							commenter.reaction_initialize($btnArea.closest('.nc-reactions-line'));
+						}
+					});
+					return false;
+				});
+				$btnArea.find(".nc-reactions-button-emo, .nc-reactions-button-text").click(function(){
+					$.ajax({
+						url:url, data:{reaction: null}, dataType: "json", type: "post",
+						success: function (response) {
+							$btnArea.find(".nc-reactions-button-emo").text(commenter.settings.default_emotion);
+							$btnArea.find(".nc-reactions-button-text").text('İfade Bırak').css('color', '#666');
+							$btnArea.closest('.nc-reactions-line').find('.nc-reactions-stat').data('emotions', response.counts);
+							commenter.reaction_initialize($btnArea.closest('.nc-reactions-line'));
+						}
+					});
+					return false;
 				});
 			},
 			delete_comment: function ($line)
@@ -415,6 +494,11 @@
 						commenter.show_history($(this).closest("li"));
 						return false;
 					});
+					// ifade butonları
+					$(this).find(".nc-reactions-button").each(function(){
+						commenter.reaction_buttons($(this));
+						commenter.reaction_initialize($(this).closest('.nc-reactions-line'));
+					});
 					$(document).trigger('netliva:commenter:initline', [$(this), commenter]);
 				},
 				show_comment: function () {
@@ -524,8 +608,8 @@
 						$("#netliva_comment_modal .modal-body").html('<div class="text-center">'+commenter.loaders.blocks+'<div><strong>Yükleniyor...</strong></div></div>');
 						$.ajax({
 							url:options.ajax.url,
-						    data: typeof options.ajax.data !== 'undefined' ? options.ajax.data : {},
-						    dataType: "html", type: "post",
+							data: typeof options.ajax.data !== 'undefined' ? options.ajax.data : {},
+							dataType: "html", type: "post",
 							success: function (response) {
 								$("#netliva_comment_modal .modal-body").html(response);
 							}

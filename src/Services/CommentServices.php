@@ -112,7 +112,7 @@ class CommentServices extends AbstractExtension
 		$eventDispatcher->dispatch(NetlivaCommenterEvents::COMMENT_BOX, $event);
 
 
-		return $this->container->get('templating')->render("@NetlivaComment/comments.html.twig", array(
+		return $this->container->get('twig')->render("@NetlivaComment/comments.html.twig", array(
 			'group'         => $group,
 			'comments'      => $comments,
 			'collaborators' => $options['collaborators'] ? $this->prepareCollaborators($group) : [],

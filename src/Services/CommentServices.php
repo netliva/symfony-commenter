@@ -140,7 +140,7 @@ class CommentServices extends AbstractExtension
 	{
 		$reaction = $this->em->getRepository('NetlivaCommentBundle:Reactions')->findOneBy(["comment"=>$comment, "addBy"=>$this->getUser()],['id'=>'DESC']);
 
-		return $this->container->get('templating')->render('@NetlivaComment/reaction_button.html.twig', [
+		return $this->container->get('twig')->render('@NetlivaComment/reaction_button.html.twig', [
 			'emo_counts'    => $this->getReactionCounts($comment),
 			"comment"       => $comment,
 			"my_last_react" => $reaction ? $reaction->getReaction() : null,

@@ -30,7 +30,7 @@ class AfterAddReactionEvent extends Event
 	}
 
 	/**
-	 * @return string|null
+	 * @return string|null (remove, update, new, nothing)
 	 */
 	public function getType ()
 	{
@@ -40,7 +40,7 @@ class AfterAddReactionEvent extends Event
 	/**
 	 * @return Reactions|null
 	 */
-	public function getReaction (): ?array
+	public function getReaction (): ?Reactions
 	{
 		return $this->reaction;
 	}

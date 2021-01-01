@@ -119,8 +119,6 @@ class CommentServices extends AbstractExtension
 			'options'       => $options,
 			'allAuthors'    => $this->prepareAllCollaborators(),
 			'topContent'    => $event->getTopContent(),
-			"emotions"      => $this->container->getParameter('netliva_commenter.emotions'),
-			"def_emo"       => $this->container->getParameter('netliva_commenter.default_emotion'),
 		));
 	}
 

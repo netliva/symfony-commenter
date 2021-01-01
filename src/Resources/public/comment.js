@@ -1,6 +1,207 @@
 
 (function ($, window) {
 
+	var netliva_commenter_global = {
+		loaders	: {
+			ring: '<div class="netliva-lds-ring"><div></div><div></div><div></div><div></div></div>',
+			blocks: '<div class="netliva-lds-blocks"><div></div><div></div><div></div></div>',
+		},
+		modal: {
+			open: function (options){
+				options = $.extend({content: '', title: '', class: 'info', buttons: null, ajax:null, }, options);
+
+				if (!$("#netliva_comment_modal").length) netliva_commenter_global.modal.create();
+
+				$("#netliva_comment_modal .modal-title").text(options.title);
+				if (options.ajax)
+				{
+					$("#netliva_comment_modal .modal-body").html('<div class="text-center">'+netliva_commenter_global.loaders.blocks+'<div><strong>Yükleniyor...</strong></div></div>');
+					$.ajax({
+						url:options.ajax.url,
+						data: typeof options.ajax.data !== 'undefined' ? options.ajax.data : {},
+						dataType: "html", type: "post",
+						success: function (response) {
+							$("#netliva_comment_modal .modal-body").html(response);
+						}
+					});
+				}
+				else
+					$("#netliva_comment_modal .modal-body").html(options.content);
+
+				$("#netliva_comment_modal .modal-header").removeClass().addClass("modal-header bg-"+options.class);
+				$("#netliva_comment_modal").modal("show");
+				if (options.buttons) netliva_commenter_global.modal.create_buttons(options.buttons);
+			},
+			close: function () {
+				$("#netliva_comment_modal").modal("hide");
+			},
+			create: function () {
+				$("body").append('\
+					<div class="modal fade" id="netliva_comment_modal" tabindex="-1" role="dialog" aria-labelledby="netliva_comment_modal" aria-hidden="true">\
+					  <div class="modal-dialog" role="document">\
+						<div class="modal-content">\
+						  <div class="modal-header">\
+							<h5 class="modal-title">Modal title</h5>\
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close">\
+							  <span aria-hidden="true">&times;</span>\
+							</button>\
+						  </div>\
+						  <div class="modal-body"> ... </div>\
+						  <div class="modal-footer bg-light" style="display: none;"></div>\
+						</div>\
+					  </div>\
+					</div>\
+				');
+			},
+			create_buttons: function($btns)
+			{
+				if ($btns !== null)
+				{
+					$("#netliva_comment_modal").find('.modal-footer').show();
+					$("#netliva_comment_modal").find('.modal-footer').html('');
+					$.each($btns, function (index, button)
+					{
+						var btnClass = "success";
+						if (typeof (button.class) !== "undefined")
+							btnClass = button.class;
+						else if (button.action === 'close')
+							btnClass = "danger";
+
+						var $btnTxt = '<button id="netliva_comment_modal_btn_' + index + '"';
+						if (button.action === 'close')
+							$btnTxt += 'data-dismiss="modal"';
+						$btnTxt += 'class="btn btn-' + btnClass + '" type="button">' + button.label + '</button>';
+
+						$("#netliva_comment_modal").find('.modal-footer').append($btnTxt);
+
+						if (typeof (button.action) === "function")
+						{
+							$("#netliva_comment_modal_btn_" + index).click(button.action);
+						}
+					});
+				}
+
+			}
+		}
+	}
+
+	$.fn.netlivaCommenterReactions = function(settings)
+	{
+		settings = $.extend({
+			emotions        : $(this).data("emotions"),
+			default_emotion : $(this).data("defaultEmotion"),
+			history_url     : $(this).data("historyUrl"),
+			add_url         : $(this).data("addUrl"),
+			comment_id      : $(this).data("commentId"),
+		}, settings);
+
+		var reactor = {
+			settings : {
+				emotions        : null,
+				default_emotion : null,
+				history_url     : null,
+				add_url         : null,
+				comment_id      : null,
+			},
+			area: null,
+			init: function (area, settings) {
+				this.settings = $.extend(this.settings, settings);
+				reactor.area = area;
+				reactor.reaction_buttons();
+				reactor.reaction_initialize();
+			},
+			reaction_initialize: function ()
+			{
+				var $statsArea = reactor.area.find('.nc-reactions-stat');
+				var emosh = $statsArea.data('emotions');
+				var $ul = $('<ul></ul>')
+				var total = 0;
+				$.each(emosh, function (emo, count) {
+					if (typeof reactor.settings.emotions[emo] !== 'undefined' )
+					{
+						total += count;
+						$ul.append('<li>'+reactor.settings.emotions[emo].emoji+'</li>');
+					}
+				});
+				$statsArea.html("");
+				if (total)
+				{
+					$ul.append('<li class="total_info">'+total+'</li>');
+					$ul.click(function () {
+						netliva_commenter_global.modal.open({
+							title: "İfadeler",
+							ajax: { url: reactor.settings.history_url },
+						});
+					});
+					$ul.appendTo($statsArea);
+				}
+			},
+			reaction_buttons: function ()
+			{
+				var $btnArea = reactor.area.find(".nc-reactions-button");
+				$btnArea.hover(function () {
+					$(this).find('.nc-reactions-box').css('left', "-"+($(this).find('.nc-reactions-box').width()/3)+"px");
+				});
+				console.log($btnArea);
+				$btnArea.find(".nc-reaction").click(function(){
+					console.log($btnArea);
+					var emoKey = $(this).data("emoKey");
+					var emoTex = $(this).data("reaction");
+					$btnArea.find(".nc-reactions-button-text").append(netliva_commenter_global.loaders.ring);
+					$.ajax({
+						url:reactor.settings.add_url, data:{reaction: emoKey}, dataType: "json", type: "post",
+						success: function (response) {
+							$btnArea.find(".netliva-lds-ring").remove();
+							if (response.type == 'remove')
+							{
+								$btnArea.find(".nc-reactions-button-emo").text(reactor.settings.default_emotion);
+								$btnArea.find(".nc-reactions-button-text").text('İfade Bırak').css('color', '#666');
+							}
+							else
+							{
+								if (typeof reactor.settings.emotions[emoKey] !== 'undefined' )
+								{
+									$btnArea.find(".nc-reactions-button-emo").text(reactor.settings.emotions[emoKey].emoji);
+									$btnArea.find(".nc-reactions-button-text").text(emoTex).css('color', reactor.settings.emotions[emoKey].color);
+								}
+							}
+							reactor.area.find('.nc-reactions-stat').data('emotions', response.counts);
+							reactor.reaction_initialize();
+						}
+					});
+					return false;
+				});
+				$btnArea.find(".nc-reactions-button-emo, .nc-reactions-button-text").click(function(){
+					if ($btnArea.find(".nc-reactions-button-emo").text() != reactor.settings.default_emotion)
+					{
+						$.ajax({
+								   url:reactor.settings.add_url, data:{reaction: null}, dataType: "json", type: "post",
+								   success: function (response) {
+									   $btnArea.find(".nc-reactions-button-emo").text(reactor.settings.default_emotion);
+									   $btnArea.find(".nc-reactions-button-text").text('İfade Bırak').css('color', '#666');
+									   reactor.area.find('.nc-reactions-stat').data('emotions', response.counts);
+									   reactor.reaction_initialize();
+								   }
+							   });
+					}
+					return false;
+				});
+			},
+		}
+
+		if (!$(this).hasClass('binded'))
+		{
+			$(this).addClass("binded");
+			if ($(this).hasClass('nc-reactions-line')) reactor.init($(this), settings);
+			else if ($(this).find('.nc-reactions-line').length == 1) reactor.init($(this).find('.nc-reactions-line'), settings);
+			else if ($(this).find('.nc-reactions-line').length > 1) {
+				$(this).find('.nc-reactions-line').each(function () {
+					$(this).netlivaCommenterReactions();
+				})
+			}
+		}
+	}
+
 	$.fn.netlivaCommenter = function(settings)
 	{
 		settings = $.extend({
@@ -11,8 +212,6 @@
 			removeme_url: $(this).data("removemeUrl"),
 			my_user: $(this).data("myUser"),
 			options: $(this).data("options"),
-			emotions: $(this).data("emotions"),
-			default_emotion: $(this).data("defaultEmotion")
 		}, settings);
 
 		var commenter = {
@@ -28,8 +227,6 @@
 				my_user          : null,
 				options          : null,
 				predefined_texts : null,
-				emotions         : null,
-				default_emotion  : null,
 			},
 			counts: {
 				limit: 5,
@@ -52,10 +249,7 @@
 					</div>\
 				',
 			},
-			loaders	: {
-				ring: '<div class="netliva-lds-ring"><div></div><div></div><div></div><div></div></div>',
-				blocks: '<div class="netliva-lds-blocks"><div></div><div></div><div></div></div>',
-			},
+
 			// === FUNCTIONS ===
 			init: function (area, settings)
 			{
@@ -154,8 +348,8 @@
 				if (typeof position === "undefined") position = "before";
 
 				commenter.area.find(".loader-block").remove();
-				if (position == "before") commenter.area.find("ul.netliva-comment-list").prepend("<li class='text-center loader-block'>"+commenter.loaders.blocks+"</li>");
-				else commenter.area.find("ul.netliva-comment-list").append("<li class='text-center loader-block'>"+commenter.loaders.blocks+"</li>");
+				if (position == "before") commenter.area.find("ul.netliva-comment-list").prepend("<li class='text-center loader-block'>"+netliva_commenter_global.loaders.blocks+"</li>");
+				else commenter.area.find("ul.netliva-comment-list").append("<li class='text-center loader-block'>"+netliva_commenter_global.loaders.blocks+"</li>");
 
 				$.ajax({
 					url:commenter.settings.refresh_url+"/"+commenter.counts.limit+"/"+commenter.counts.last_id, dataType: "json", type: "post", data: {options: commenter.settings.options},
@@ -190,7 +384,7 @@
 				$(document).trigger('netliva:commenter:send:click', [$comment_area, commenter]);
 				var $input = $comment_area.find("textarea");
 				$input.prop("disabled",true);
-				$input.before(commenter.loaders.ring);
+				$input.before(netliva_commenter_global.loaders.ring);
 				$.ajax({
 					url: commenter.settings.create_url,
 					data:{
@@ -230,87 +424,15 @@
 			},
 			show_history: function ($line)
 			{
-				commenter.modal.open({
+				netliva_commenter_global.modal.open({
 					title: "Yorum Geçmişi",
 					ajax: {url:$line.data("historyUrl")},
 				});
 			},
-			reaction_initialize: function ($BtnLine)
-			{
-				var $statsArea = $BtnLine.find('.nc-reactions-stat');
-				var emosh = $statsArea.data('emotions');
-				var $ul = $('<ul></ul>')
-				var total = 0;
-				$.each(emosh, function (emo, count) {
-					if (typeof commenter.settings.emotions[emo] !== 'undefined' )
-					{
-						total += count;
-						$ul.append('<li>'+commenter.settings.emotions[emo].emoji+'</li>');
-					}
-				});
-				$statsArea.html("");
-				if (total)
-				{
-					$ul.append('<li class="total_info">'+total+'</li>');
-					$ul.click(function () {
-						commenter.modal.open({
-							title: "İfadeler",
-							ajax: {url:$BtnLine.find('.nc-reactions-button').data("historyUrl")},
-						});
-					});
-					$ul.appendTo($statsArea);
-				}
-			},
-			reaction_buttons: function ($btnArea)
-			{
-				var commentId = $btnArea.data('commentId')
-				var url = $btnArea.data('addUrl')
-				$btnArea.hover(function () {
-					$(this).find('.nc-reactions-box').css('left', "-"+($(this).find('.nc-reactions-box').width()/3)+"px");
-				})
-				$btnArea.find(".nc-reaction").click(function(){
-					var emoKey = $(this).data("emoKey");
-					var emoTex = $(this).data("reaction");
-					$btnArea.find(".nc-reactions-button-text").append(commenter.loaders.ring);
-					$.ajax({
-						url:url, data:{reaction: emoKey}, dataType: "json", type: "post",
-						success: function (response) {
-							$btnArea.find(".netliva-lds-ring").remove();
-							if (response.type == 'remove')
-							{
-								$btnArea.find(".nc-reactions-button-emo").text(commenter.settings.default_emotion);
-								$btnArea.find(".nc-reactions-button-text").text('İfade Bırak').css('color', '#666');
-							}
-							else
-							{
-								if (typeof commenter.settings.emotions[emoKey] !== 'undefined' )
-								{
-									$btnArea.find(".nc-reactions-button-emo").text(commenter.settings.emotions[emoKey].emoji);
-									$btnArea.find(".nc-reactions-button-text").text(emoTex).css('color', commenter.settings.emotions[emoKey].color);
-								}
-							}
-							$btnArea.closest('.nc-reactions-line').find('.nc-reactions-stat').data('emotions', response.counts);
-							commenter.reaction_initialize($btnArea.closest('.nc-reactions-line'));
-						}
-					});
-					return false;
-				});
-				$btnArea.find(".nc-reactions-button-emo, .nc-reactions-button-text").click(function(){
-					$.ajax({
-						url:url, data:{reaction: null}, dataType: "json", type: "post",
-						success: function (response) {
-							$btnArea.find(".nc-reactions-button-emo").text(commenter.settings.default_emotion);
-							$btnArea.find(".nc-reactions-button-text").text('İfade Bırak').css('color', '#666');
-							$btnArea.closest('.nc-reactions-line').find('.nc-reactions-stat').data('emotions', response.counts);
-							commenter.reaction_initialize($btnArea.closest('.nc-reactions-line'));
-						}
-					});
-					return false;
-				});
-			},
+
 			delete_comment: function ($line)
 			{
-				commenter.modal.open({
+				netliva_commenter_global.modal.open({
 					title: "Silme Onayı",
 					content: "Yorumu silmek istediğinizden emin misiniz?",
 					buttons: [{
@@ -320,7 +442,7 @@
 								url: $line.data("deleteUrl"), data:{}, dataType: "json", type: "post",
 								success: function (response) {
 									$line.remove();
-									commenter.modal.close();
+									netliva_commenter_global.modal.close();
 								}
 							});
 						}
@@ -333,7 +455,7 @@
 			update: function ($line) {
 				var $input = $line.find(".comment-input-container textarea");
 				$input.prop("disabled",true);
-				$input.before(commenter.loaders.ring);
+				$input.before(netliva_commenter_global.loaders.ring);
 
 				$.ajax({
 					url:$line.data("updateUrl"),
@@ -396,7 +518,7 @@
 					})
 
 				}
-				commenter.modal.open({
+				netliva_commenter_global.modal.open({
 					class: "danger text-white",
 					title: "Hata!",
 					content: "<div class='text-center m-2'>"+text+"</div>",
@@ -495,9 +617,8 @@
 						return false;
 					});
 					// ifade butonları
-					$(this).find(".nc-reactions-button").each(function(){
-						commenter.reaction_buttons($(this));
-						commenter.reaction_initialize($(this).closest('.nc-reactions-line'));
+					$(this).find(".nc-reactions-line").each(function(){
+						$(this).netlivaCommenterReactions();
 					});
 					$(document).trigger('netliva:commenter:initline', [$(this), commenter]);
 				},
@@ -596,83 +717,6 @@
 
 				}
 			},
-			modal: {
-				open: function (options){
-					options = $.extend({content: '', title: '', class: 'info', buttons: null, ajax:null, }, options);
-
-					if (!$("#netliva_comment_modal").length) commenter.modal.create();
-
-					$("#netliva_comment_modal .modal-title").text(options.title);
-					if (options.ajax)
-					{
-						$("#netliva_comment_modal .modal-body").html('<div class="text-center">'+commenter.loaders.blocks+'<div><strong>Yükleniyor...</strong></div></div>');
-						$.ajax({
-							url:options.ajax.url,
-							data: typeof options.ajax.data !== 'undefined' ? options.ajax.data : {},
-							dataType: "html", type: "post",
-							success: function (response) {
-								$("#netliva_comment_modal .modal-body").html(response);
-							}
-						});
-					}
-					else
-						$("#netliva_comment_modal .modal-body").html(options.content);
-
-					$("#netliva_comment_modal .modal-header").removeClass().addClass("modal-header bg-"+options.class);
-					$("#netliva_comment_modal").modal("show");
-					if (options.buttons) commenter.modal.create_buttons(options.buttons);
-				},
-				close: function () {
-					$("#netliva_comment_modal").modal("hide");
-				},
-				create: function () {
-					$("body").append('\
-						<div class="modal fade" id="netliva_comment_modal" tabindex="-1" role="dialog" aria-labelledby="netliva_comment_modal" aria-hidden="true">\
-						  <div class="modal-dialog" role="document">\
-							<div class="modal-content">\
-							  <div class="modal-header">\
-								<h5 class="modal-title">Modal title</h5>\
-								<button type="button" class="close" data-dismiss="modal" aria-label="Close">\
-								  <span aria-hidden="true">&times;</span>\
-								</button>\
-							  </div>\
-							  <div class="modal-body"> ... </div>\
-							  <div class="modal-footer bg-light" style="display: none;"></div>\
-							</div>\
-						  </div>\
-						</div>\
-					');
-				},
-				create_buttons: function($btns)
-				{
-					if ($btns !== null)
-					{
-						$("#netliva_comment_modal").find('.modal-footer').show();
-						$("#netliva_comment_modal").find('.modal-footer').html('');
-						$.each($btns, function (index, button)
-						{
-							var btnClass = "success";
-							if (typeof (button.class) !== "undefined")
-								btnClass = button.class;
-							else if (button.action === 'close')
-								btnClass = "danger";
-
-							var $btnTxt = '<button id="netliva_comment_modal_btn_' + index + '"';
-							if (button.action === 'close')
-								$btnTxt += 'data-dismiss="modal"';
-							$btnTxt += 'class="btn btn-' + btnClass + '" type="button">' + button.label + '</button>';
-
-							$("#netliva_comment_modal").find('.modal-footer').append($btnTxt);
-
-							if (typeof (button.action) === "function")
-							{
-								$("#netliva_comment_modal_btn_" + index).click(button.action);
-							}
-						});
-					}
-
-				}
-			}
 		};
 
 

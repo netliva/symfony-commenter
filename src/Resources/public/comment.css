@@ -257,7 +257,7 @@ li.select_user_for_add {
 
 .nc-reaction { font-size: 36px; list-style-type: none; cursor: pointer; display: inline-block; width: 48px; margin-top:0; height: 48px; transform: scale(0.8, 0.8); transition: opacity .5s ease-in-out 1s, transform .07s ease-in-out 0s, margin .07s ease-in-out 0s; background-repeat: no-repeat; background-size: cover; background-position: center center; }
 .nc-reaction:hover { transform: scale(1, 1); margin-top: -10px;	}
-.nc-reaction::before { font-size: 11px; content: attr(data-reaction); display: inline-block; color: #ffffff; text-align: center; line-height: 17px;  width: 160%; left: -40%; height: 17px; margin-left: 10%; background-color: rgba(0, 0, 0, 0.6); border-radius: 20px; position: absolute; top: -25px; opacity: 0; transition: opacity .2s ease-in-out 0s; }
+.nc-reaction::before { font-size: 11px; content: attr(data-reaction) !important; display: inline-block; color: #ffffff; text-align: center; line-height: 17px;  width: 160%; left: -40%; height: 17px; margin-left: 10%; background-color: rgba(0, 0, 0, 0.6); border-radius: 20px; position: absolute; top: -25px; opacity: 0; transition: opacity .2s ease-in-out 0s; }
 .nc-reaction:hover::before { opacity: 1 }
 
 .nc-reactions-button:hover .nc-reaction { opacity: 1; animation-name: reaction_delay; animation-duration: .5s; }

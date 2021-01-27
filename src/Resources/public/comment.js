@@ -193,8 +193,7 @@
 		{
 			$(this).addClass("binded");
 			if ($(this).hasClass('nc-reactions-line')) reactor.init($(this), settings);
-			else if ($(this).find('.nc-reactions-line').length == 1) reactor.init($(this).find('.nc-reactions-line'), settings);
-			else if ($(this).find('.nc-reactions-line').length > 1) {
+			else if ($(this).find('.nc-reactions-line').length) {
 				$(this).find('.nc-reactions-line').each(function () {
 					$(this).netlivaCommenterReactions();
 				})

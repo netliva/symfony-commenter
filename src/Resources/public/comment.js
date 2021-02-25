@@ -142,9 +142,9 @@
 				$btnArea.hover(function () {
 					$(this).find('.nc-reactions-box').css('left', "-"+($(this).find('.nc-reactions-box').width()/3)+"px");
 				});
-				console.log($btnArea);
+				// console.log($btnArea);
 				$btnArea.find(".nc-reaction").click(function(){
-					console.log($btnArea);
+					// console.log($btnArea);
 					var emoKey = $(this).data("emoKey");
 					var emoTex = $(this).data("reaction");
 					$btnArea.find(".nc-reactions-button-text").append(netliva_commenter_global.loaders.ring);

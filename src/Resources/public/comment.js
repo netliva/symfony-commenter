@@ -189,15 +189,21 @@
 			},
 		}
 
-		if (!$(this).hasClass('binded'))
+
+		if ($(this).hasClass('nc-reactions-line') && !$(this).hasClass('binded'))
 		{
 			$(this).addClass("binded");
-			if ($(this).hasClass('nc-reactions-line')) reactor.init($(this), settings);
-			else if ($(this).find('.nc-reactions-line').length) {
-				$(this).find('.nc-reactions-line').each(function () {
-					$(this).netlivaCommenterReactions();
-				})
-			}
+			reactor.init($(this), settings);
+		}
+		else if ($(this).find('.nc-reactions-line').length)
+		{
+			$(this).find('.nc-reactions-line').each(function () {
+				if (!$(this).hasClass('binded'))
+				{
+					$(this).addClass("binded");
+					reactor.init($(this), settings);
+				}
+			});
 		}
 	}
 

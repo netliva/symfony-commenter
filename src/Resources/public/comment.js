@@ -458,7 +458,7 @@
 
 				$.ajax({
 					url:$line.data("updateUrl"),
-					data:{ comment:$input.val() },
+					data:{ comment:$input.val(), options: commenter.settings.options },
 					dataType:"json", type:"post",
 					success:function(response)
 					{

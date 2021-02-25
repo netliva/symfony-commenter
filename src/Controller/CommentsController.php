@@ -221,6 +221,7 @@ class CommentsController extends Controller
 		$html = $this->renderView('@NetlivaComment/comment.'.$viewtype.'.html.twig', array(
 			'group' => $entity->getGroup(),
 			'comments' => [$entity],
+			'options'  => $request->request->get('options'),
 		));
 
 		return new JsonResponse( ['return'=>'success', 'html'=>$html] );

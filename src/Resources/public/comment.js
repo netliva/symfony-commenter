@@ -198,11 +198,7 @@
 		else if ($(this).find('.nc-reactions-line').length)
 		{
 			$(this).find('.nc-reactions-line').each(function () {
-				if (!$(this).hasClass('binded'))
-				{
-					$(this).addClass("binded");
-					reactor.init($(this), settings);
-				}
+				$(this).netlivaCommenterReactions();
 			});
 		}
 	}

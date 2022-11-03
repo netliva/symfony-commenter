@@ -2,15 +2,25 @@
 
 namespace Netliva\CommentBundle\Entity;
 
+use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Persistence\Mapping\ClassMetadata;
+use Doctrine\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManagerAware;
 use Netliva\CommentBundle\Entity\AuthorInterface;
 
 /**
  * @ORM\Entity
  * @ORM\Table(name="netliva_commenter")
  */
-class Comments
+class Comments implements ObjectManagerAware
 {
+
+    private $em;
+    public function injectObjectManager (ObjectManager $objectManager, ClassMetadata $classMetadata)
+    {
+        $this->em = $objectManager;
+    }
 	/**
 	 * @var integer
 	 *
@@ -178,13 +188,26 @@ class Comments
 	 */
 	public function getAuthor (): ?AuthorInterface
 	{
+		if ($this->author)
+		{
+		    try {
+			$this->author->__toString();
+		    }
+		    catch (EntityNotFoundException $exception)
+		    {
+			$this->setAuthor(null);
+			$this->em->flush();
+			return null;
+		    }
+		}
+
 		return $this->author;
 	}
 
 	/**
 	 * @param AuthorInterface $author
 	 */
-	public function setAuthor (AuthorInterface $author): self
+	public function setAuthor (?AuthorInterface $author): self
 	{
 		$this->author = $author;
 

@@ -54,6 +54,10 @@ class CommentServices extends AbstractExtension
 			if ($author->isAuthor())
 				$collaborators[] = $this->prepareCollaboratorsObject($author);
 		}
+        usort($collaborators, function($a, $b) {
+            $c = new \Collator('tr_TR');
+            return $c->compare($a['name'], $b['name']);
+        });
 		return $collaborators;
 	}
 
@@ -79,7 +83,11 @@ class CommentServices extends AbstractExtension
 				if ($author->isAuthor())
 					$collaborators[] = $this->prepareCollaboratorsObject($author);
 			}
-			return $collaborators;
+            usort($collaborators, function($a, $b) {
+                $c = new \Collator('tr_TR');
+                return $c->compare($a['name'], $b['name']);
+            });
+            return $collaborators;
 		}
 
 		return [];

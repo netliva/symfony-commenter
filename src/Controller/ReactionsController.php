@@ -22,9 +22,11 @@ class ReactionsController extends Controller
 
 		$reaction = $em->getRepository('NetlivaCommentBundle:Reactions')->findOneBy(["comment"=>$comment, "addBy"=>$this->getUser()],['id'=>'DESC']);
 
+		$old = null;
 		$type = 'nothing';
 		if ($reaction)
 		{
+		    $old = $reaction->getReaction();
 			if ($reaction->getReaction() == $request->request->get("reaction") || !$request->request->get("reaction"))
 			{
 				$em->remove($reaction);
@@ -51,7 +53,7 @@ class ReactionsController extends Controller
 		$em->flush();
 
 		$eventDispatcher = $this->get('event_dispatcher');
-		$event = new AfterAddReactionEvent($type, $reaction);
+		$event = new AfterAddReactionEvent($type, $reaction, $old);
 		$eventDispatcher->dispatch(NetlivaCommenterEvents::AFTER_REACTION, $event);
 		
 		$commenter = $this->get('netliva_commenter');

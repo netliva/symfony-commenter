@@ -17,6 +17,10 @@ class AfterAddReactionEvent extends Event
 	 * @var Reactions|null
 	 */
 	private $reaction;
+	/**
+	 * @var string|null
+	 */
+	private $oldReactionKey;
 
 	/**
 	 * AfterAddCommentEvent constructor.
@@ -24,9 +28,10 @@ class AfterAddReactionEvent extends Event
 	 * @param string|null $type
 	 * @param Reactions|null    $reaction
 	 */
-	public function __construct (?string $type, ?Reactions $reaction) {
+	public function __construct (?string $type, ?Reactions $reaction, ?string $oldReactionKey) {
 		$this->type = $type;
 		$this->reaction = $reaction;
+		$this->oldReactionKey = $oldReactionKey;
 	}
 
 	/**
@@ -35,6 +40,13 @@ class AfterAddReactionEvent extends Event
 	public function getType ()
 	{
 		return $this->type;
+	}
+	/**
+	 * @return string|null
+	 */
+	public function getOldReactionKey ()
+	{
+		return $this->oldReactionKey;
 	}
 
 	/**

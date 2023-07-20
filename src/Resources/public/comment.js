@@ -729,7 +729,7 @@
 
 	init = function()
 	{
-		$(".netliva-comments-area:not(.binded)").each(function () {
+		$(".netliva-comments-area:visible:not(.binded)").each(function () {
 			$(this).netlivaCommenter();
 		});
 	};

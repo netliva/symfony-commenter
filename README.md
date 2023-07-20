@@ -134,7 +134,7 @@ Event Key & Class | Descriptions
 --- | ---
 NetlivaCommenterEvents::AFTER_ADD `Netliva\CommentBundle\Event\AfterAddCommentEvent` | Yorum eklendikten sonra çalışır
 NetlivaCommenterEvents::AFTER_ADD_COLLABORATOR `Netliva\CommentBundle\Event\AfterAddCollaboratorsEvent` | Katılımcı eklendikten sonra çalışır
-NetlivaCommenterEvents::COMMENT_BOX `Netliva\CommentBundle\Event\CommentBoxEvent` | Yorum eklendikten sonra çalışır
+NetlivaCommenterEvents::COMMENT_BOX `Netliva\CommentBundle\Event\CommentBoxEvent` | Yorum alanı oluşturulurken çalışır
 NetlivaCommenterEvents::AFTER_REACTION `Netliva\CommentBundle\Event\AfterAddReactionEvent` | İfade bıraktıktan sonra çalışır
 NetlivaCommenterEvents::USER_IMAGE `Netliva\CommentBundle\Event\UserImageEvent` | Kullanıcının profil fotoğrafına ulaşmak istendiğinde çalışır
 

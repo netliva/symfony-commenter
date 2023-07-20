@@ -18,6 +18,7 @@ class CommentServices extends AbstractExtension
 	 * @var ContainerInterface
 	 */
 	private $container;
+    private $allCollaborators = null;
 
 	public function __construct($em, ContainerInterface $container ){
 		$this->em = $em;
@@ -47,41 +48,52 @@ class CommentServices extends AbstractExtension
 
 	private function prepareAllCollaborators ()
 	{
+        if (!is_null($this->allCollaborators))
+            return $this->allCollaborators;
+
 		$authors = $this->em->getRepository("NetlivaCommentBundle:AuthorInterface")->findAll();
-		$collaborators = [];
+        $this->allCollaborators = [];
 		foreach ($authors as $author)
 		{
-			if ($author->isAuthor())
-				$collaborators[] = $this->prepareCollaboratorsObject($author);
+			if ($author->isAuthor() && !key_exists($author->getId(), $this->allCollaborators))
+                $this->allCollaborators[$author->getId()] = $this->prepareCollaboratorsObject($author);
 		}
-        usort($collaborators, function($a, $b) {
+        uasort($this->allCollaborators, function($a, $b) {
             $c = new \Collator('tr_TR');
             return $c->compare($a['name'], $b['name']);
         });
-		return $collaborators;
+
+		return $this->allCollaborators;
 	}
 
 	private function prepareCollaborators ($group)
 	{
-		$collaborators = null;
+		$collaboratorIds = null;
 		$colInfoEntity = $this->em->getRepository('NetlivaCommentBundle:CommentsGroupInfo')->findOneBy(['group' => $group, 'key'=> 'collaborators']);
 		if ($colInfoEntity)
 		{
-			$collaborators = $colInfoEntity->getInfo();
+            $collaboratorIds = $colInfoEntity->getInfo();
 		}
 
-		if (is_array($collaborators) and count($collaborators))
+		if (is_array($collaboratorIds) and count($collaboratorIds))
 		{
-			$qb = $this->em->getRepository("NetlivaCommentBundle:AuthorInterface")->createQueryBuilder("ai");
-			$qb->where($qb->expr()->in("ai.id", ":ids"));
-			$qb->setParameter('ids', $collaborators);
-			$authors = $qb->getQuery()->getResult();
-
 			$collaborators = [];
-			foreach ($authors as $author)
+			foreach ($collaboratorIds as $id)
 			{
-				if ($author->isAuthor())
-					$collaborators[] = $this->prepareCollaboratorsObject($author);
+                if (key_exists($id, $this->allCollaborators))
+                {
+                    $collaborators[$id] = $this->allCollaborators[$id];
+                }
+                else
+                {
+                    $author = $this->em->getRepository("NetlivaCommentBundle:AuthorInterface")->find($id);
+                    if ($author && $author->isAuthor())
+                    {
+                        $collaborators[$id] = $this->prepareCollaboratorsObject($author);
+                        if (!key_exists($id, $this->allCollaborators))
+                            $this->allCollaborators[$id] = $collaborators[$id];
+                    }
+                }
 			}
             usort($collaborators, function($a, $b) {
                 $c = new \Collator('tr_TR');
@@ -114,15 +126,13 @@ class CommentServices extends AbstractExtension
 		   'reactions'        => true,
 	    ],$options);
 
-		$comments        = $this->em->getRepository('NetlivaCommentBundle:Comments')->findByGroup($group);
 		$eventDispatcher = $this->container->get('event_dispatcher');
-		$event           = new CommentBoxEvent($comments, $group, $options);
+		$event           = new CommentBoxEvent($group, $options);
 		$eventDispatcher->dispatch(NetlivaCommenterEvents::COMMENT_BOX, $event);
 
 
 		return $this->container->get('twig')->render("@NetlivaComment/comments.html.twig", array(
 			'group'         => $group,
-			'comments'      => $comments,
 			'collaborators' => $options['collaborators'] ? $this->prepareCollaborators($group) : [],
 			'options'       => $options,
 			'allAuthors'    => $this->prepareAllCollaborators(),

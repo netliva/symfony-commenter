@@ -7,9 +7,7 @@ use Symfony\Component\EventDispatcher\Event;
 
 class CommentBoxEvent extends Event
 {
-
-	private $comments;
-	/**
+    /**
 	 * @var string
 	 */
 	private $group;
@@ -25,21 +23,15 @@ class CommentBoxEvent extends Event
 	/**
 	 * CommentsTopContentEvent constructor.
 	 *
-	 * @param Comments[] $comments
 	 * @param string     $group
 	 * @param array      $options
 	 */
-	public function __construct ($comments, $group, $options) {
+	public function __construct ($group, $options) {
 
-		$this->comments = $comments;
 		$this->group    = $group;
 		$this->options  = $options;
 	}
-
-	public function getComments ()
-	{
-		return $this->comments;
-	}
+    
 
 	/**
 	 * @return string

@@ -355,7 +355,6 @@
 				$.ajax({
 					url:commenter.settings.refresh_url+"/"+commenter.counts.limit+"/"+commenter.counts.last_id, dataType: "json", type: "post", data: {options: commenter.settings.options},
 					success: function (response) {
-						commenter.area.find(".firstInitLoader").remove();
 						commenter.counts.loaded += response.count;
 						commenter.counts.total   = response.total;
 						commenter.counts.last_id = response.lastId;
@@ -369,6 +368,7 @@
 					},
 				    complete: function () {
 					    commenter.area.find(".loader-block").remove();
+						commenter.area.find(".firstInitLoader").remove();
 				    },
 				});
 			},

@@ -11,7 +11,13 @@
 	data-predefined-texts="{{options.predefined_texts|json_encode}}"
 >
 	{{ topContent|raw }}
-	<div class="text-center"><button class="netliva-show-old-comments-btn btn-sm btn btn-link mt-2">{# Eski yorumları yüklenme butonu #}</button></div>
+	<div class="text-center">
+		<div class="firstInitLoader netliva-lds-blocks"><div></div><div></div><div></div></div>
+		<button class="netliva-show-old-comments-btn btn-sm btn btn-link mt-2">
+			{# Eski yorumları yüklenme butonu #}
+			Bekleyiniz, Yükleniyor... <br />
+			</button>
+		</div>
 	<ul class="list-unstyled netliva-comment-list">
 		{# Yorumlar AJAX ile yüklenecek #}
 		<li class='text-center loader-block showed-comment'><div class="netliva-lds-blocks"><div></div><div></div><div></div></div></li>

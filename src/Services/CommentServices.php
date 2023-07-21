@@ -80,7 +80,7 @@ class CommentServices extends AbstractExtension
 			$collaborators = [];
 			foreach ($collaboratorIds as $id)
 			{
-                if (key_exists($id, $this->allCollaborators))
+                if ($this->allCollaborators && key_exists($id, $this->allCollaborators))
                 {
                     $collaborators[$id] = $this->allCollaborators[$id];
                 }
@@ -90,7 +90,7 @@ class CommentServices extends AbstractExtension
                     if ($author && $author->isAuthor())
                     {
                         $collaborators[$id] = $this->prepareCollaboratorsObject($author);
-                        if (!key_exists($id, $this->allCollaborators))
+                        if (is_array($this->allCollaborators) && !key_exists($id, $this->allCollaborators))
                             $this->allCollaborators[$id] = $collaborators[$id];
                     }
                 }
@@ -133,9 +133,9 @@ class CommentServices extends AbstractExtension
 
 		return $this->container->get('twig')->render("@NetlivaComment/comments.html.twig", array(
 			'group'         => $group,
+			'allAuthors'    => $this->prepareAllCollaborators(),
 			'collaborators' => $options['collaborators'] ? $this->prepareCollaborators($group) : [],
 			'options'       => $options,
-			'allAuthors'    => $this->prepareAllCollaborators(),
 			'topContent'    => $event->getTopContent(),
 		));
 	}

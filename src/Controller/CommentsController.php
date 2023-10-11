@@ -20,60 +20,8 @@ class CommentsController extends Controller
 {
 	public function listAction($group, $listType, $limitId, $limit, Request $request)
 	{
-		/** @var EntityManager $em */
-		$em = $this->getDoctrine()->getManager();
-
-		$count = $em->getRepository('NetlivaCommentBundle:Comments')->createQueryBuilder('comments')
-			->select('COUNT(comments.id) as total')
-			->where('comments.group = :gr')
-			->setParameter("gr",$group)
-			->getQuery()->getSingleResult();
-		$count = (int) $count["total"];
-
-		$qb = $em->getRepository('NetlivaCommentBundle:Comments')->createQueryBuilder("c");
-		$qb->where($qb->expr()->eq("c.group", ":g"));
-		$qb->setParameter("g", $group);
-		$qb->orderBy("c.addAt", "DESC");
-		$qb->setMaxResults($limit);
-
-		if ($limitId)
-		{
-			$qb->andWhere(
-				$qb->expr()->lt("c.id", $limitId)
-			);
-		}
-
-		$comments = $qb->getQuery()->getResult();
-
-		uasort($comments, function ($first, $second) { return $first->getAddAt() > $second->getAddAt() ? 1 : -1; });
-		$lastId = 0;
-		if (count($comments))
-		{
-			$first = current($comments);
-			$lastId = $first->getId();
-		}
-
-		if ($count)
-		{
-			$html = $this->renderView('@NetlivaComment/comment.'.$listType.'.html.twig', array(
-				'group'    => $group,
-				'comments' => $comments,
-				'options'  => $request->request->get('options'),
-			));
-		}
-		else
-		{
-			$html = '<li class="text-center"><em>İlk Yorumu Sen Yap</em></li>';
-		}
-
-
-		return new JsonResponse([
-			'total'  => $count,
-			'count'  => count($comments),
-			'lastId' => $lastId,
-			'html'   => $html
-		]);
-
+        $nc = $this->container->get('netliva_commenter');
+		return new JsonResponse($nc->loadComments($group, $listType, $limit, $limitId, $request->request->get('options')));
 	}
 
 

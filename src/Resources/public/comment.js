@@ -210,6 +210,7 @@
 			refresh_url: $(this).data("refreshUrl"),
 			new_coll_url: $(this).data("newcollUrl"),
 			predefined_texts: $(this).data("predefinedTexts"),
+			preload_comments: $(this).data("preloadComments"),
 			removeme_url: $(this).data("removemeUrl"),
 			my_user: $(this).data("myUser"),
 			options: $(this).data("options"),
@@ -228,12 +229,12 @@
 				my_user          : null,
 				options          : null,
 				predefined_texts : null,
+				preload_comments : null,
 			},
 			counts: {
 				limit: 5,
 				total: 0,
 				loaded: 0,
-				last_load: 0,
 				last_id: 0,
 			},
 			// === Elements ===
@@ -258,7 +259,13 @@
 				this.settings = $.extend(this.settings, settings);
 				this.area.find(this.e.show_old_btn).click(this.actions.show_comment);
 				commenter.create_comment_input();
-				commenter.load_comments();
+				if (this.settings.preload_comments)
+				{
+					this.counts.total   = this.settings.preload_comments.total;
+					this.counts.loaded  = this.settings.preload_comments.loaded;
+					this.counts.last_id = this.settings.preload_comments.last_id;
+				}
+				else commenter.load_comments();
 				commenter.initalize_collaborators();
 				commenter.area.find('.netliva-comment-input').focus(function () {
 					if (!commenter.area.hasClass('comment-input-focus')) commenter.area.addClass('comment-input-focus')

@@ -105,6 +105,59 @@ class CommentServices extends AbstractExtension
 		return [];
 	}
 
+	public function loadComments($group, $listType, $limit, $limitId = null, $options=[])
+	{
+        $count = $this->em->getRepository('NetlivaCommentBundle:Comments')->createQueryBuilder('comments')
+            ->select('COUNT(comments.id) as total')
+            ->where('comments.group = :gr')
+            ->setParameter("gr",$group)
+            ->getQuery()->getSingleResult();
+        $count = (int) $count["total"];
+
+        $qb = $this->em->getRepository('NetlivaCommentBundle:Comments')->createQueryBuilder("c");
+        $qb->where($qb->expr()->eq("c.group", ":g"));
+        $qb->setParameter("g", $group);
+        $qb->orderBy("c.addAt", "DESC");
+        $qb->setMaxResults($limit);
+
+        if ($limitId)
+        {
+            $qb->andWhere(
+                $qb->expr()->lt("c.id", $limitId)
+            );
+        }
+
+        $comments = $qb->getQuery()->getResult();
+
+        uasort($comments, function ($first, $second) { return $first->getAddAt() > $second->getAddAt() ? 1 : -1; });
+        $lastId = 0;
+        if (count($comments))
+        {
+            $first = current($comments);
+            $lastId = $first->getId();
+        }
+
+        if ($count)
+        {
+            $html = $this->container->get('templating')->render('@NetlivaComment/comment.'.$listType.'.html.twig', array(
+                'group'    => $group,
+                'comments' => $comments,
+                'options'  => $options,
+            ));
+        }
+        else
+        {
+            $html = '<li class="text-center"><em>İlk Yorumu Sen Yap</em></li>';
+        }
+
+        return [
+            'total'  => $count,
+            'count'  => count($comments),
+            'lastId' => $lastId,
+            'html'   => $html
+        ];
+	}
+
 	public function prepareCollaboratorsObject($author)
 	{
 		$eventDispatcher = $this->container->get('event_dispatcher');
@@ -124,19 +177,29 @@ class CommentServices extends AbstractExtension
 		   'predefined_texts' => [],
 		   'collaborators'    => true,
 		   'reactions'        => true,
-	    ],$options);
-
+		   'pre_load'         => null, // ön yüklenecek maksimum yorum sayısı
+	    ], $options);
+        
+        $preloadComments = [];
+        if ($options['pre_load'] && is_numeric($options['pre_load']))
+        {
+            $nc = $this->container->get('netliva_commenter');
+            // total, count, lastId, html
+            $preloadComments = $nc->loadComments($group, $options['list_type'], $options['pre_load'], null, $options);
+        }
+        
 		$eventDispatcher = $this->container->get('event_dispatcher');
 		$event           = new CommentBoxEvent($group, $options);
 		$eventDispatcher->dispatch(NetlivaCommenterEvents::COMMENT_BOX, $event);
 
 
 		return $this->container->get('twig')->render("@NetlivaComment/comments.html.twig", array(
-			'group'         => $group,
-			'allAuthors'    => $this->prepareAllCollaborators(),
-			'collaborators' => $options['collaborators'] ? $this->prepareCollaborators($group) : [],
-			'options'       => $options,
-			'topContent'    => $event->getTopContent(),
+            'group'           => $group,
+            'allAuthors'      => $this->prepareAllCollaborators(),
+            'collaborators'   => $options['collaborators'] ? $this->prepareCollaborators($group) : [],
+            'options'         => $options,
+            'preloadComments' => $preloadComments,
+            'topContent'      => $event->getTopContent(),
 		));
 	}
 

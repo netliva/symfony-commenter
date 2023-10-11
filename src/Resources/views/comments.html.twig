@@ -1,5 +1,5 @@
 <div
-	class="netliva-comments-area comm-grp-{{group}} comm-type-{{options.list_type}} no-comment"
+	class="netliva-comments-area comm-grp-{{group}} comm-type-{{options.list_type}} {{ (not preloadComments or preloadComments.total == 0) ? 'no-comment' }}"
 	data-create-url="{{ path('netliva_symfony_comments_create') }}"
 	data-refresh-url="{{ path('netliva_symfony_comments_list', {"group": group, "listType": options.list_type}) }}"
 	data-newcoll-url="{{ path('netliva_symfony_new_collaborators', {"group": group}) }}"
@@ -8,19 +8,26 @@
 	data-my-user="{{ app.user|prepareCollaboratorsObject|json_encode }}"
 	data-group="{{ group }}"
 	data-options="{{ options|json_encode }}"
+	data-preload-comments="{{ preloadComments ? ({total:preloadComments.total, loaded:preloadComments.count, last_id:preloadComments.lastId}|json_encode) : null }}"
 	data-predefined-texts="{{options.predefined_texts|json_encode}}"
 >
 	{{ topContent|raw }}
-	<div class="text-center">
-		<div class="firstInitLoader netliva-lds-blocks"><div></div><div></div><div></div></div>
-		<button class="netliva-show-old-comments-btn btn-sm btn btn-link mt-2">
-			{# Eski yorumları yüklenme butonu #}
-			Bekleyiniz, Yükleniyor... <br />
+	{% if not preloadComments or not preloadComments.html %}
+		<div class="text-center">
+			<div class="firstInitLoader netliva-lds-blocks"><div></div><div></div><div></div></div>
+			<button class="netliva-show-old-comments-btn btn-sm btn btn-link mt-2">
+				{# Eski yorumları yüklenme butonu #}
+				Bekleyiniz, Yükleniyor... <br />
 			</button>
 		</div>
+	{% endif %}
 	<ul class="list-unstyled netliva-comment-list">
-		{# Yorumlar AJAX ile yüklenecek #}
-		<li class='text-center loader-block showed-comment'><div class="netliva-lds-blocks"><div></div><div></div><div></div></div></li>
+		{% if preloadComments and preloadComments.html %}
+			{{ preloadComments.html|raw }}
+		{% else %}
+			{# Yorumlar AJAX ile yüklenecek #}
+			<li class='text-center loader-block showed-comment'><div class="netliva-lds-blocks"><div></div><div></div><div></div></div></li>
+		{% endif %}
 	</ul>
 	<div class="netliva-comment-footer-area">
 		<div class="netliva-comment-input-area"></div>

@@ -18,7 +18,7 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root(' netliva_comment');
+        $rootNode = $treeBuilder->root('netliva_comment');
 
 		$rootNode
 			->children()

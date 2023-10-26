@@ -279,7 +279,7 @@ class Comments
 	/**
 	 * @return \Doctrine\Common\Collections\Collection
 	 */
-	public function getReactions (): \Doctrine\Common\Collections\Collection
+	public function getReactions (): ?\Doctrine\Common\Collections\Collection
 	{
 		return $this->reactions;
 	}
@@ -287,7 +287,7 @@ class Comments
 	/**
 	 * @param \Doctrine\Common\Collections\Collection $reactions
 	 */
-	public function seReactions (\Doctrine\Common\Collections\Collection $reactions): void
+	public function setReactions (\Doctrine\Common\Collections\Collection $reactions): void
 	{
 		$this->reactions = $reactions;
 	}

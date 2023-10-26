@@ -22,6 +22,9 @@ class Configuration implements ConfigurationInterface
 
 		$rootNode
 			->children()
+                ->scalarNode('cache_path')
+                    ->defaultValue(null)
+                ->end()
 				->scalarNode('default_emotion')
 					->defaultValue('👍')
 				->end()

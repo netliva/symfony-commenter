@@ -7,6 +7,7 @@
 					{{ row.author and app.user.id == row.author.id ? "netliva-my-comment" }}
 					{{ (row.author and prev == row.author.id) ? "netliva-continues-comment" }}
 					{{ row.answerTo ? "netliva-answer-comment-line" }}
+					{{ row.reactions ? "netliva-comment-with-reactions" }}
 					{{ row.answerTo and row.answerTo.id == prev_id ? "netliva-answer-to-prev" }}
 				  "
 			data-id="{{row.id}}"
@@ -29,10 +30,10 @@
 					</div>
 				{% endif %}
 				<div class="nc-bubble">
-					<strong class="ntlv_user_name">{{row.author ? row.author : (row.authorStr ? row.authorStr : 'Bilinmiyor') }}</strong>
+					<strong class="ntlv_user_name">{{row.author ? row.author.name : (row.authorStr ? row.authorStr : 'Bilinmiyor') }}</strong>
 					{% if row.answerTo %}
 						<span class="netliva-answer-comment">
-							<strong class="ntlv_user_name">{{row.answerTo.author ? row.answerTo.author : (row.answerTo.authorStr ? row.answerTo.authorStr : 'Bilinmiyor') }}</strong>
+							<strong class="ntlv_user_name">{{row.answerTo.author ? row.answerTo.author.name : (row.answerTo.authorStr ? row.answerTo.authorStr : 'Bilinmiyor') }}</strong>
 							{{ row.answerTo.comment|nl2br }}
 							<small>
 								<em>{{ row.answerTo.addAt|date("d.m.Y - H:i") }}</em>

@@ -232,10 +232,9 @@
 				preload_comments : null,
 			},
 			counts: {
-				limit: 5,
+				page: 1,
 				total: 0,
 				loaded: 0,
-				last_id: 0,
 			},
 			// === Elements ===
 			e : {
@@ -263,7 +262,6 @@
 				{
 					this.counts.total   = this.settings.preload_comments.total;
 					this.counts.loaded  = this.settings.preload_comments.loaded;
-					this.counts.last_id = this.settings.preload_comments.last_id;
 				}
 				else commenter.load_comments();
 				commenter.initalize_collaborators();
@@ -360,11 +358,10 @@
 				else commenter.area.find("ul.netliva-comment-list").append("<li class='text-center loader-block'>"+netliva_commenter_global.loaders.blocks+"</li>");
 
 				$.ajax({
-					url:commenter.settings.refresh_url+"/"+commenter.counts.limit+"/"+commenter.counts.last_id, dataType: "json", type: "post", data: {options: commenter.settings.options},
+					url:commenter.settings.refresh_url+"/"+commenter.counts.page, dataType: "json", type: "post", data: {options: commenter.settings.options},
 					success: function (response) {
 						commenter.counts.loaded += response.count;
 						commenter.counts.total   = response.total;
-						commenter.counts.last_id = response.lastId;
 						if (position == "before") commenter.area.find("ul.netliva-comment-list").prepend(response.html);
 						else commenter.area.find("ul.netliva-comment-list").html(response.html);
 						commenter.update_show_btn();
@@ -404,10 +401,9 @@
 					success:function(response,  textStatus, jqXHR)
 					{
 						$(document).trigger('netliva:commenter:send:success', [$comment_area, response,  textStatus, jqXHR, commenter]);
-						commenter.counts.limit   = 5;
+						commenter.counts.page    = 1;
 						commenter.counts.loaded  = 0;
 						commenter.counts.total   = 0;
-						commenter.counts.last_id = 0;
 						commenter.load_comments("over");
 						$input.val("").prop("disabled",false);
 
@@ -634,10 +630,9 @@
 				show_comment: function () {
 					var $btn = commenter.area.find(commenter.e.show_old_btn);
 					var left = commenter.counts.total - commenter.counts.loaded;
-					$btn.html((commenter.counts.limit>left?left:commenter.counts.limit)+" Adet "+(commenter.counts.limit>3?"Daha ":"")+"Yükleniyor...");
+					$btn.html("Yükleniyor...");
+					commenter.counts.page++;
 					commenter.load_comments();
-
-					if (commenter.counts.limit<15) commenter.counts.limit += 2;
 				},
 				add_collaborators_close: function () {
 					var $collaborators_ul = commenter.area.find(commenter.e.collaborators).find('ul');

@@ -1,6 +1,6 @@
 netliva_symfony_comments_list:
-    path:     /comments/list/{group}/{listType}/{limit}/{limitId}
-    defaults: { _controller: NetlivaCommentBundle:Comments:list, limitId: null, limit: 5 }
+    path:     /comments/list/{group}/{listType}/{page}
+    defaults: { _controller: NetlivaCommentBundle:Comments:list, page: 1 }
 
 netliva_symfony_comments_create:
     path:     /comments/create

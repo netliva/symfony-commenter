@@ -18,10 +18,10 @@ use function Doctrine\ORM\QueryBuilder;
  */
 class CommentsController extends Controller
 {
-	public function listAction($group, $listType, $limitId, $limit, Request $request)
+	public function listAction($group, $listType, $page, Request $request)
 	{
         $nc = $this->container->get('netliva_commenter');
-		return new JsonResponse($nc->loadComments($group, $listType, $limit, $limitId, $request->request->get('options')));
+		return new JsonResponse($nc->loadComments($group, $listType, $page, $request->request->get('options')));
 	}
 
 

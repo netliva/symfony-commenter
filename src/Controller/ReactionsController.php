@@ -51,13 +51,19 @@ class ReactionsController extends Controller
 			$em->persist($reaction);
 		}
 		$em->flush();
+		$em->refresh($comment);
 
 		$eventDispatcher = $this->get('event_dispatcher');
 		$event = new AfterAddReactionEvent($type, $reaction, $old);
 		$eventDispatcher->dispatch(NetlivaCommenterEvents::AFTER_REACTION, $event);
 		
+        $reacts = [];
+        foreach ($comment->getReactions() as $reaction)
+        {
+            $reacts[$reaction->getAddBy()->getId()] = $reaction->getReaction();
+        }
 		$commenter = $this->get('netliva_commenter');
-		return new JsonResponse(["situ" => "success", "type" => $type, 'counts' => $commenter->getReactionCounts($comment)]);
+		return new JsonResponse(["situ" => "success", "type" => $type, 'counts' => $commenter->getReactionCounts($reacts)]);
 	}
 
 	public function historyAction(Comments $comment)

@@ -22,6 +22,7 @@ class NetlivaCommentExtension extends Extension
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
+		$container->setParameter('netliva_commenter.cache_path', $config['cache_path']);
 		$container->setParameter('netliva_commenter.emotions', $config['emotions']);
 		$container->setParameter('netliva_commenter.default_emotion', $config['default_emotion']);
 

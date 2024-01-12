@@ -164,11 +164,13 @@ class CommentsController extends Controller
 		$em->persist($entity);
 		$em->flush();
 
+        $nc = $this->container->get('netliva_commenter');
+        $data = $nc->createCommentData($entity);
 
 
 		$html = $this->renderView('@NetlivaComment/comment.'.$viewtype.'.html.twig', array(
 			'group' => $entity->getGroup(),
-			'comments' => [$entity],
+			'comments' => [$data],
 			'options'  => $request->request->get('options'),
 		));
 

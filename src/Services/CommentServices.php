@@ -2,7 +2,9 @@
 
 namespace Netliva\CommentBundle\Services;
 
+use Netliva\CommentBundle\Entity\AuthorInterface;
 use Netliva\CommentBundle\Entity\Comments;
+use Netliva\CommentBundle\Entity\CommentsGroupInfo;
 use Netliva\CommentBundle\Entity\Reactions;
 use Netliva\CommentBundle\Event\CommentBoxEvent;
 use Netliva\CommentBundle\Event\NetlivaCommenterEvents;
@@ -62,7 +64,7 @@ class CommentServices extends AbstractExtension
         if (!is_null($this->allCollaborators))
             return $this->allCollaborators;
 
-		$authors = $this->em->getRepository("NetlivaCommentBundle:AuthorInterface")->findAll();
+		$authors = $this->em->getRepository(AuthorInterface::class)->findAll();
         $this->allCollaborators = [];
 		foreach ($authors as $author)
 		{
@@ -80,7 +82,7 @@ class CommentServices extends AbstractExtension
 	private function prepareCollaborators ($group)
 	{
 		$collaboratorIds = null;
-		$colInfoEntity = $this->em->getRepository('NetlivaCommentBundle:CommentsGroupInfo')->findOneBy(['group' => $group, 'key'=> 'collaborators']);
+		$colInfoEntity = $this->em->getRepository(CommentsGroupInfo::class)->findOneBy(['group' => $group, 'key'=> 'collaborators']);
 		if ($colInfoEntity)
 		{
             $collaboratorIds = $colInfoEntity->getInfo();
@@ -97,7 +99,7 @@ class CommentServices extends AbstractExtension
                 }
                 else
                 {
-                    $author = $this->em->getRepository("NetlivaCommentBundle:AuthorInterface")->find($id);
+                    $author = $this->em->getRepository(AuthorInterface::class)->find($id);
                     if ($author && $author->isAuthor())
                     {
                         $collaborators[$id] = $this->prepareCollaboratorsObject($author);
@@ -169,7 +171,7 @@ class CommentServices extends AbstractExtension
         if(file_exists($tempPath))
             unlink($tempPath);
 
-        $count = $this->em->getRepository('NetlivaCommentBundle:Comments')->createQueryBuilder('comments')
+        $count = $this->em->getRepository(Comments::class)->createQueryBuilder('comments')
             ->select('COUNT(comments.id) as total')
             ->where('comments.group = :gr')
             ->setParameter("gr",$group)
@@ -184,7 +186,7 @@ class CommentServices extends AbstractExtension
         for ($i = 0; $i<ceil($count/$limit); $i++)
         {
             $this->em->clear();
-            $qb = $this->em->getRepository('NetlivaCommentBundle:Comments')->createQueryBuilder("c");
+            $qb = $this->em->getRepository(Comments::class)->createQueryBuilder("c");
             $qb->where($qb->expr()->eq("c.group", ":g"));
             $qb->setParameter("g", $group);
             $qb->orderBy("c.addAt", "DESC");

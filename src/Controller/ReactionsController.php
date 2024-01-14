@@ -20,7 +20,7 @@ class ReactionsController extends Controller
 	{
 		$em = $this->getDoctrine()->getManager();
 
-		$reaction = $em->getRepository('NetlivaCommentBundle:Reactions')->findOneBy(["comment"=>$comment, "addBy"=>$this->getUser()],['id'=>'DESC']);
+		$reaction = $em->getRepository(Reactions::class)->findOneBy(["comment"=>$comment, "addBy"=>$this->getUser()],['id'=>'DESC']);
 
 		$old = null;
 		$type = 'nothing';

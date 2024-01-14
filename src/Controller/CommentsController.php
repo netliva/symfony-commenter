@@ -3,6 +3,7 @@
 namespace Netliva\CommentBundle\Controller;
 
 use Doctrine\ORM\EntityManager;
+use Netliva\CommentBundle\Entity\AuthorInterface;
 use Netliva\CommentBundle\Entity\Comments;
 use Netliva\CommentBundle\Entity\CommentsGroupInfo;
 use Netliva\CommentBundle\Event\AfterAddCollaboratorsEvent;
@@ -67,7 +68,7 @@ class CommentsController extends Controller
 	{
 		$em = $this->getDoctrine()->getManager();
 
-		$colInfoEntity = $em->getRepository('NetlivaCommentBundle:CommentsGroupInfo')->findOneBy(['group' => $group, 'key'=> 'collaborators']);
+		$colInfoEntity = $em->getRepository(CommentsGroupInfo::class)->findOneBy(['group' => $group, 'key'=> 'collaborators']);
 
 		if ($colInfoEntity and $colInfoEntity->getInfo() and is_array($colInfoEntity->getInfo()) && in_array($this->getUser()->getId(), $colInfoEntity->getInfo()))
 		{
@@ -92,7 +93,7 @@ class CommentsController extends Controller
 
 
 		$eventDispatcher = $this->get('event_dispatcher');
-		$event = new AfterAddCollaboratorsEvent($em->getRepository('NetlivaCommentBundle:AuthorInterface')->find($request->request->get('author')), $collaborators, $group);
+		$event = new AfterAddCollaboratorsEvent($em->getRepository(AuthorInterface::class)->find($request->request->get('author')), $collaborators, $group);
 		$eventDispatcher->dispatch(NetlivaCommenterEvents::AFTER_ADD_COLLABORATOR, $event);
 
 
@@ -120,7 +121,7 @@ class CommentsController extends Controller
 	public function historyAction($id)
 	{
 		$em = $this->getDoctrine()->getManager();
-		$entity = $em->getRepository('NetlivaCommentBundle:Comments')->find($id);
+		$entity = $em->getRepository(Comments::class)->find($id);
 
 		if (!$entity) {
 			return new JsonResponse(array('situ' => "error", "errors" => ["title"=>["Unable to find Reminder entity."]]));
@@ -137,7 +138,7 @@ class CommentsController extends Controller
 	{
 		$em = $this->getDoctrine()->getManager();
 		/** @var Comments $entity */
-		$entity = $em->getRepository('NetlivaCommentBundle:Comments')->find($id);
+		$entity = $em->getRepository(Comments::class)->find($id);
 
 		if (!$entity) {
 			return new JsonResponse(array("errors" => ["title"=>["Unable to find Reminder entity."]]), 404);
@@ -182,7 +183,7 @@ class CommentsController extends Controller
 	public function deleteAction(Request $request, $id)
 	{
 		$em = $this->getDoctrine()->getManager();
-		$entity = $em->getRepository('NetlivaCommentBundle:Comments')->find($id);
+		$entity = $em->getRepository(Comments::class)->find($id);
 
 		if (!$entity) {
 			return new JsonResponse(array('situ' => "error", "errors" => ["title"=>["Unable to find Reminder entity."]]));
@@ -199,7 +200,7 @@ class CommentsController extends Controller
 	{
 		$em = $this->getDoctrine()->getManager();
 
-		$colInfoEntity = $em->getRepository('NetlivaCommentBundle:CommentsGroupInfo')->findOneBy(['group' => $group, 'key'=> 'collaborators']);
+		$colInfoEntity = $em->getRepository(CommentsGroupInfo::class)->findOneBy(['group' => $group, 'key'=> 'collaborators']);
 		if (!$colInfoEntity)
 		{
 			$colInfoEntity = new CommentsGroupInfo();

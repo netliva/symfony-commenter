@@ -10,6 +10,7 @@ use Netliva\CommentBundle\Event\CommentBoxEvent;
 use Netliva\CommentBundle\Event\NetlivaCommenterEvents;
 use Netliva\CommentBundle\Event\UserImageEvent;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Twig\Environment;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
@@ -17,17 +18,16 @@ use Twig\TwigFunction;
 class CommentServices extends AbstractExtension
 {
 	protected $em;
-	/**
-	 * @var ContainerInterface
-	 */
 	private $container;
     private $allCollaborators = null;
+    private $environment = null;
     private $cachePath;
     private $limitPerPage = 6;
 
-	public function __construct($em, ContainerInterface $container ){
+	public function __construct($em, ContainerInterface $container, Environment $environment){
 		$this->em = $em;
 		$this->container = $container;
+		$this->environment = $environment;
 
         $cachePath = $this->container->getParameter('netliva_commenter.cache_path');
         if (!$cachePath) $cachePath = $this->container->getParameter('kernel.cache_dir').DIRECTORY_SEPARATOR.'netliva_comment';
@@ -234,7 +234,7 @@ class CommentServices extends AbstractExtension
 
         if ($count)
         {
-            $html = $this->container->get('templating')->render('@NetlivaComment/comment.'.$listType.'.html.twig', array(
+            $html = $this->environment->render('@NetlivaComment/comment.'.$listType.'.html.twig', array(
                 'group'    => $group,
                 'comments' => $comments,
                 'options'  => $options,
@@ -286,7 +286,7 @@ class CommentServices extends AbstractExtension
 		$eventDispatcher->dispatch(NetlivaCommenterEvents::COMMENT_BOX, $event);
 
 
-		return $this->container->get('twig')->render("@NetlivaComment/comments.html.twig", array(
+		return $this->environment->render("@NetlivaComment/comments.html.twig", array(
             'group'           => $group,
             'allAuthors'      => $this->prepareAllCollaborators(),
             'collaborators'   => $options['collaborators'] ? $this->prepareCollaborators($group) : [],
@@ -311,7 +311,7 @@ class CommentServices extends AbstractExtension
 	public function reactionButton (array $comment)
 	{
         $reaction = key_exists($this->getUser()->getId(), $comment['reactions']) ? $comment['reactions'][$this->getUser()->getId()] : null;
-		return $this->container->get('twig')->render('@NetlivaComment/reaction_button.html.twig', [
+		return $this->environment->render('@NetlivaComment/reaction_button.html.twig', [
 			'emo_counts'    => $this->getReactionCounts($comment['reactions']),
 			"comment"       => $comment,
 			"my_last_react" => $reaction,

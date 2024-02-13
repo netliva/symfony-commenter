@@ -9,15 +9,14 @@ use Netliva\CommentBundle\Entity\CommentsGroupInfo;
 use Netliva\CommentBundle\Event\AfterAddCollaboratorsEvent;
 use Netliva\CommentBundle\Event\AfterAddCommentEvent;
 use Netliva\CommentBundle\Event\NetlivaCommenterEvents;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use function Doctrine\ORM\QueryBuilder;
 
 /**
  * Comments controller.
  */
-class CommentsController extends Controller
+class CommentsController extends AbstractController
 {
 	public function listAction($group, $listType, $page, Request $request)
 	{

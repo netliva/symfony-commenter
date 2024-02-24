@@ -4,7 +4,7 @@ namespace Netliva\CommentBundle\Event;
 
 use Netliva\CommentBundle\Entity\AuthorInterface;
 use Netliva\CommentBundle\Entity\Comments;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class AfterAddCollaboratorsEvent extends Event
 {

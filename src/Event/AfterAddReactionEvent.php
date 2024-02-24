@@ -4,7 +4,7 @@ namespace Netliva\CommentBundle\Event;
 
 use Netliva\CommentBundle\Entity\Comments;
 use Netliva\CommentBundle\Entity\Reactions;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class AfterAddReactionEvent extends Event
 {

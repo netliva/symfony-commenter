@@ -3,7 +3,7 @@ namespace Netliva\CommentBundle\Event;
 
 
 use Netliva\CommentBundle\Entity\Comments;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class AfterAddCommentEvent extends Event
 {

@@ -57,7 +57,7 @@ class CommentsController extends AbstractController
 
 		$eventDispatcher = $this->get('event_dispatcher');
 		$event = new AfterAddCommentEvent($entity, $collaborators);
-		$eventDispatcher->dispatch(NetlivaCommenterEvents::AFTER_ADD, $event);
+		$eventDispatcher->dispatch($event, NetlivaCommenterEvents::AFTER_ADD);
 
 
 		return new JsonResponse( ["situ" => "success", 'id' => $entity->getId()] );
@@ -93,7 +93,7 @@ class CommentsController extends AbstractController
 
 		$eventDispatcher = $this->get('event_dispatcher');
 		$event = new AfterAddCollaboratorsEvent($em->getRepository(AuthorInterface::class)->find($request->request->get('author')), $collaborators, $group);
-		$eventDispatcher->dispatch(NetlivaCommenterEvents::AFTER_ADD_COLLABORATOR, $event);
+		$eventDispatcher->dispatch($event, NetlivaCommenterEvents::AFTER_ADD_COLLABORATOR);
 
 
 		return new JsonResponse( ["situ" => "success"] );

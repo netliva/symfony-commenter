@@ -55,7 +55,7 @@ class ReactionsController extends Controller
 
 		$eventDispatcher = $this->get('event_dispatcher');
 		$event = new AfterAddReactionEvent($type, $reaction, $old);
-		$eventDispatcher->dispatch(NetlivaCommenterEvents::AFTER_REACTION, $event);
+		$eventDispatcher->dispatch($event, NetlivaCommenterEvents::AFTER_REACTION);
 		
         $reacts = [];
         foreach ($comment->getReactions() as $reaction)

@@ -3,7 +3,7 @@ namespace Netliva\CommentBundle\Event;
 
 
 use Netliva\CommentBundle\Entity\AuthorInterface;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class UserImageEvent extends Event
 {

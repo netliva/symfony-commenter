@@ -257,7 +257,7 @@ class CommentServices extends AbstractExtension
 	{
 		$eventDispatcher = $this->container->get('event_dispatcher');
 		$event = new UserImageEvent($author);
-		$eventDispatcher->dispatch(NetlivaCommenterEvents::USER_IMAGE, $event);
+		$eventDispatcher->dispatch($event, NetlivaCommenterEvents::USER_IMAGE);
 		return [
 			'id'    => $author->getId(),
 			'name'  => (string)$author,
@@ -283,7 +283,7 @@ class CommentServices extends AbstractExtension
         
 		$eventDispatcher = $this->container->get('event_dispatcher');
 		$event           = new CommentBoxEvent($group, $options);
-		$eventDispatcher->dispatch(NetlivaCommenterEvents::COMMENT_BOX, $event);
+		$eventDispatcher->dispatch($event, NetlivaCommenterEvents::COMMENT_BOX);
 
 
 		return $this->environment->render("@NetlivaComment/comments.html.twig", array(

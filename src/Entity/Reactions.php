@@ -32,14 +32,14 @@ class Reactions
 	/**
 	 * @var \DateTime
 	 *
-	 * @ORM\Column(type="datetime")
+	 * @ORM\Column(type="datetime", name="addAt")
 	 */
     private $addAt;
 
 	/**
 	 * @var string
 	 *
-	 * @ORM\Column(type="string", length=255)
+	 * @ORM\Column(type="string", length=255, name="addByStr")
 	 */
 	private $addByStr;
 
@@ -47,7 +47,7 @@ class Reactions
 	 * @var AuthorInterface
 	 *
 	 * @ORM\ManyToOne(targetEntity="AuthorInterface")
-	 * @ORM\JoinColumn()
+	 * @ORM\JoinColumn(name="addBy_id")
 	 */
 	private $addBy;
 

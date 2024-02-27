@@ -40,7 +40,7 @@ class Comments
 	/**
 	 * @var \DateTime
 	 *
-	 * @ORM\Column(type="datetime")
+	 * @ORM\Column(type="datetime", name="addAt")
 	 */
     private $addAt;
 
@@ -61,7 +61,7 @@ class Comments
 
 	/**
 	 * @var \DateTime
-	 * @ORM\Column(type="datetime", nullable=true)
+	 * @ORM\Column(type="datetime", name="editAt", nullable=true)
 	 */
     private $editAt;
 
@@ -98,7 +98,7 @@ class Comments
 	 * @var Comments
 	 *
 	 * @ORM\ManyToOne(targetEntity="Netliva\CommentBundle\Entity\Comments", inversedBy="answers")
-	 * @ORM\JoinColumn(nullable=true)
+	 * @ORM\JoinColumn(nullable=true, name="answerTo_id")
 	 */
 	private $answerTo;
 

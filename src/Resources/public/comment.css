@@ -259,7 +259,7 @@ li.select_user_for_add {
 .nc-reactions-box { height: 54px; width: auto; padding:3px 5px; position: absolute; top: -54px; left: 0px; box-shadow: 1px 1px 2px #cccccc, -1px 0 2px #eeeeee; border-radius: 44px 44px; display: none; background-color: white; z-index: 3; }
 .nc-reactions-button:hover .nc-reactions-box { display: flex; }
 
-.nc-reaction { font-size: 36px; list-style-type: none; cursor: pointer; display: inline-block; width: 48px; margin-top:0; height: 48px; transform: scale(0.8, 0.8); transition: opacity .5s ease-in-out 1s, transform .07s ease-in-out 0s, margin .07s ease-in-out 0s; background-repeat: no-repeat; background-size: cover; background-position: center center; }
+.nc-reaction { font-size: 36px; list-style-type: none; cursor: pointer; display: inline-block; width: 38px; margin-top:0; height: 48px; transform: scale(0.8, 0.8); transition: opacity .5s ease-in-out 1s, transform .07s ease-in-out 0s, margin .07s ease-in-out 0s; background-repeat: no-repeat; background-size: cover; background-position: center center; }
 .nc-reaction:hover { transform: scale(1, 1); margin-top: -10px;	}
 .nc-reaction::before { font-size: 11px; content: attr(data-reaction) !important; display: inline-block; color: #ffffff; text-align: center; line-height: 17px;  width: 160%; left: -40%; height: 17px; margin-left: 10%; background-color: rgba(0, 0, 0, 0.6); border-radius: 20px; position: absolute; top: -25px; opacity: 0; transition: opacity .2s ease-in-out 0s; }
 .nc-reaction:hover::before { opacity: 1 }

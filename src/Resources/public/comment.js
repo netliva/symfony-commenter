@@ -140,7 +140,16 @@
 			{
 				var $btnArea = reactor.area.find(".nc-reactions-button");
 				$btnArea.hover(function () {
-					$(this).find('.nc-reactions-box').css('left', "-"+($(this).find('.nc-reactions-box').width()/3)+"px");
+					const alanfark = $(this).closest('.netliva-comments-area').width()
+						- (
+							(
+								$(this).offset().left
+								- $(this).closest('.netliva-comments-area').offset().left
+							)
+							+ $(this).find('.nc-reactions-box').width()
+						);
+					const left = alanfark < 0 ? alanfark + 20 : -($(this).find('.nc-reactions-box').width()/3);
+					$(this).find('.nc-reactions-box').css('left', left+"px");
 				});
 				// console.log($btnArea);
 				$btnArea.find(".nc-reaction").click(function(){

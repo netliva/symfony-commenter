@@ -194,6 +194,7 @@ li.select_user_for_add {
 	padding: 0;
 	top: 40px;
 	left: 0;
+	z-index: 5;
 }
 .select_user_for_add ul li {
 	width: auto; background: transparent !important;

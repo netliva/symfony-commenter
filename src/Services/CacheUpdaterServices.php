@@ -13,10 +13,10 @@ class CacheUpdaterServices
 	protected $em;
 	protected $commentServices;
 	protected $container;
-	public function __construct(EntityManagerInterface $em, ContainerInterface $container){
+	public function __construct(EntityManagerInterface $em, ContainerInterface $container, CommentServices $commentServices){
 		$this->em = $em;
 		$this->container = $container;
-        $this->commentServices = $this->container->get('netliva_commenter');
+        $this->commentServices = $commentServices;
     }
 
 

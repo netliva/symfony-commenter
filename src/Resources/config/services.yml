@@ -1,31 +1,23 @@
 services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+
+    Netliva\CommentBundle\Controller\:
+        resource: '../../Controller/'
+        tags: [ 'controller.service_arguments' ]
+        
     Netliva\CommentBundle\Services\CommentServices:
         class: Netliva\CommentBundle\Services\CommentServices
-        public: false
-        arguments: ["@doctrine.orm.entity_manager", "@service_container", "@twig"]
         tags:
             - { name: twig.extension }
-
-    netliva_commenter:
-        alias: Netliva\CommentBundle\Services\CommentServices
-        public: true
         
-    Netliva\CommentBundle\Services\CacheUpdaterServices:
-        class: Netliva\CommentBundle\Services\CacheUpdaterServices
-        public: false
-        arguments: ["@doctrine.orm.entity_manager", "@service_container"]
-
-    netliva_commenter_cacheUpdater:
-        alias: Netliva\CommentBundle\Services\CacheUpdaterServices
-        public: true
-
-    netliva_commenter.comments_controller:
-        class: Netliva\CommentBundle\Controller\CommentsController
-        arguments: ["@event_dispatcher"]
+    Netliva\CommentBundle\Services\:
+        resource: '../../Services/'
         
     netliva_commenter.cacheClear:
         class: Netliva\CommentBundle\EventListener\CacheClearEventListener
-        arguments: [ "@service_container", "@netliva_commenter_cacheUpdater"]
         tags:
             - { name: 'doctrine.event_listener', event: 'postPersist', connection: 'default' }
             - { name: 'doctrine.event_listener', event: 'postUpdate', connection: 'default' }

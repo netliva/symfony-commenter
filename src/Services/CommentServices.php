@@ -2,6 +2,7 @@
 
 namespace Netliva\CommentBundle\Services;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Netliva\CommentBundle\Entity\AuthorInterface;
 use Netliva\CommentBundle\Entity\Comments;
 use Netliva\CommentBundle\Entity\CommentsGroupInfo;
@@ -24,7 +25,7 @@ class CommentServices extends AbstractExtension
     private $cachePath;
     private $limitPerPage = 6;
 
-	public function __construct($em, ContainerInterface $container, Environment $environment){
+	public function __construct(EntityManagerInterface $em, ContainerInterface $container, Environment $environment){
 		$this->em = $em;
 		$this->container = $container;
 		$this->environment = $environment;

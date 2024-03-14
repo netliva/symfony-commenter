@@ -92,7 +92,8 @@ netliva_comment:
 ```yaml
 # config/routes/netliva_commenter.yaml
 netliva_comment_route:
-    resource: '@NetlivaCommentBundle/Resources/config/routing.yaml'
+    resource: "@NetlivaCommentBundle/Controller/"
+    type: annotation
     prefix: /netliva
 ```
 

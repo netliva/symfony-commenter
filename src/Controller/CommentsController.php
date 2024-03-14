@@ -11,6 +11,7 @@ use Netliva\CommentBundle\Event\AfterAddCommentEvent;
 use Netliva\CommentBundle\Event\NetlivaCommenterEvents;
 use Netliva\CommentBundle\Services\CommentServices;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -20,6 +21,11 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class CommentsController extends AbstractController
 {
+    private $dispatcher;
+    public function __construct (EventDispatcherInterface $dispatcher) {
+        $this->dispatcher = $dispatcher;
+    }
+
     /**
      * @Route(name="netliva_symfony_comments_list", path="/comments/list/{group}/{listType}/{page}", defaults={"page": "1"})
      */
@@ -62,9 +68,8 @@ class CommentsController extends AbstractController
 
 		$collaborators = $this->addCollaborators($group, $this->getUser()->getId());
 
-		$eventDispatcher = $this->get('event_dispatcher');
 		$event = new AfterAddCommentEvent($entity, $collaborators);
-		$eventDispatcher->dispatch($event, NetlivaCommenterEvents::AFTER_ADD);
+        $this->dispatcher->dispatch($event, NetlivaCommenterEvents::AFTER_ADD);
 
 
 		return new JsonResponse( ["situ" => "success", 'id' => $entity->getId()] );

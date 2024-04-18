@@ -256,6 +256,15 @@ class CommentServices extends AbstractExtension
 
     public function prepareCollaboratorsObject($author)
 	{
+        if (!($author instanceof AuthorInterface))
+        {
+            return [
+                'id'    => null,
+                'name'  => "Belirlenemedi",
+                'photo' => null,
+            ];
+        }
+
 		$eventDispatcher = $this->container->get('event_dispatcher');
 		$event = new UserImageEvent($author);
 		$eventDispatcher->dispatch($event, NetlivaCommenterEvents::USER_IMAGE);

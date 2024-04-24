@@ -8,6 +8,7 @@ use Netliva\CommentBundle\Event\AfterAddReactionEvent;
 use Netliva\CommentBundle\Event\NetlivaCommenterEvents;
 use Netliva\CommentBundle\Services\CommentServices;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -20,7 +21,7 @@ class ReactionsController extends AbstractController
     /**
      * @Route(name="netliva_symfony_reaction_add", path="/add/{id}")
      */
-	public function addAction(Request $request, Comments $comment, CommentServices $commentServices)
+	public function addAction(Request $request, Comments $comment, CommentServices $commentServices, EventDispatcherInterface $dispatcher)
 	{
 		$em = $this->getDoctrine()->getManager();
 
@@ -57,9 +58,8 @@ class ReactionsController extends AbstractController
 		$em->flush();
 		$em->refresh($comment);
 
-		$eventDispatcher = $this->get('event_dispatcher');
 		$event = new AfterAddReactionEvent($type, $reaction, $old);
-		$eventDispatcher->dispatch($event, NetlivaCommenterEvents::AFTER_REACTION);
+		$dispatcher->dispatch($event, NetlivaCommenterEvents::AFTER_REACTION);
 		
         $reacts = [];
         foreach ($comment->getReactions() as $reaction)

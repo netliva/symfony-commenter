@@ -11,6 +11,7 @@ use Netliva\CommentBundle\Event\CommentBoxEvent;
 use Netliva\CommentBundle\Event\NetlivaCommenterEvents;
 use Netliva\CommentBundle\Event\UserImageEvent;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Twig\Environment;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
@@ -18,17 +19,23 @@ use Twig\TwigFunction;
 
 class CommentServices extends AbstractExtension
 {
-	protected $em;
-	private $container;
+    protected $em;
+    private $container;
     private $allCollaborators = null;
     private $environment = null;
     private $cachePath;
     private $limitPerPage = 6;
 
-	public function __construct(EntityManagerInterface $em, ContainerInterface $container, Environment $environment){
-		$this->em = $em;
-		$this->container = $container;
-		$this->environment = $environment;
+    public function __construct(
+        EntityManagerInterface $em,
+        ContainerInterface $container,
+        Environment $environment,
+        EventDispatcherInterface $dispatcher
+    ){
+        $this->em = $em;
+        $this->container = $container;
+        $this->dispatcher = $dispatcher;
+        $this->environment = $environment;
 
         $cachePath = $this->container->getParameter('netliva_commenter.cache_path');
         if (!$cachePath) $cachePath = $this->container->getParameter('kernel.cache_dir').DIRECTORY_SEPARATOR.'netliva_comment';
@@ -40,60 +47,60 @@ class CommentServices extends AbstractExtension
     }
 
 
-	private function getUser()
-	{
-		return $this->container->get('security.token_storage')->getToken()->getUser();
-	}
+    private function getUser()
+    {
+        return $this->container->get('security.token_storage')->getToken()->getUser();
+    }
 
-	public function getFilters()
-	{
-		return array(
-			new TwigFilter('prepareCollaboratorsObject', [$this, 'prepareCollaboratorsObject'], array('is_safe' => array('html'))),
-		);
-	}
+    public function getFilters()
+    {
+        return array(
+            new TwigFilter('prepareCollaboratorsObject', [$this, 'prepareCollaboratorsObject'], array('is_safe' => array('html'))),
+        );
+    }
 
-	public function getFunctions()
-	{
-		return array(
-			new TwigFunction('commentbox', [$this, 'commentBox'], array('is_safe' => array('html'))),
-			new TwigFunction('reaction_button', [$this, 'reactionButton'], array('is_safe' => array('html'))),
-		);
-	}
+    public function getFunctions()
+    {
+        return array(
+            new TwigFunction('commentbox', [$this, 'commentBox'], array('is_safe' => array('html'))),
+            new TwigFunction('reaction_button', [$this, 'reactionButton'], array('is_safe' => array('html'))),
+        );
+    }
 
-	private function prepareAllCollaborators ()
-	{
+    private function prepareAllCollaborators ()
+    {
         if (!is_null($this->allCollaborators))
             return $this->allCollaborators;
 
-		$authors = $this->em->getRepository(AuthorInterface::class)->findAll();
+        $authors = $this->em->getRepository(AuthorInterface::class)->findAll();
         $this->allCollaborators = [];
-		foreach ($authors as $author)
-		{
-			if ($author->isAuthor() && !key_exists($author->getId(), $this->allCollaborators))
+        foreach ($authors as $author)
+        {
+            if ($author->isAuthor() && !key_exists($author->getId(), $this->allCollaborators))
                 $this->allCollaborators[$author->getId()] = $this->prepareCollaboratorsObject($author);
-		}
+        }
         uasort($this->allCollaborators, function($a, $b) {
             $c = new \Collator('tr_TR');
             return $c->compare($a['name'], $b['name']);
         });
 
-		return $this->allCollaborators;
-	}
+        return $this->allCollaborators;
+    }
 
-	private function prepareCollaborators ($group)
-	{
-		$collaboratorIds = null;
-		$colInfoEntity = $this->em->getRepository(CommentsGroupInfo::class)->findOneBy(['group' => $group, 'key'=> 'collaborators']);
-		if ($colInfoEntity)
-		{
+    private function prepareCollaborators ($group)
+    {
+        $collaboratorIds = null;
+        $colInfoEntity = $this->em->getRepository(CommentsGroupInfo::class)->findOneBy(['group' => $group, 'key'=> 'collaborators']);
+        if ($colInfoEntity)
+        {
             $collaboratorIds = $colInfoEntity->getInfo();
-		}
+        }
 
-		if (is_array($collaboratorIds) and count($collaboratorIds))
-		{
-			$collaborators = [];
-			foreach ($collaboratorIds as $id)
-			{
+        if (is_array($collaboratorIds) and count($collaboratorIds))
+        {
+            $collaborators = [];
+            foreach ($collaboratorIds as $id)
+            {
                 if ($this->allCollaborators && key_exists($id, $this->allCollaborators))
                 {
                     $collaborators[$id] = $this->allCollaborators[$id];
@@ -108,16 +115,16 @@ class CommentServices extends AbstractExtension
                             $this->allCollaborators[$id] = $collaborators[$id];
                     }
                 }
-			}
+            }
             usort($collaborators, function($a, $b) {
                 $c = new \Collator('tr_TR');
                 return $c->compare($a['name'], $b['name']);
             });
             return $collaborators;
-		}
+        }
 
-		return [];
-	}
+        return [];
+    }
 
 
     public function createCommentData (Comments $comment)
@@ -217,8 +224,8 @@ class CommentServices extends AbstractExtension
         }
     }
 
-	public function loadComments($group, $listType, $page = 1, $options=[])
-	{
+    public function loadComments($group, $listType, $page = 1, $options=[])
+    {
         $filePath = $this->cachePath.'/'.$group.'.json';
         if(!file_exists($filePath))
         {
@@ -251,7 +258,7 @@ class CommentServices extends AbstractExtension
             'count'  => count($comments),
             'html'   => $html
         ];
-	}
+    }
 
 
     public function prepareCollaboratorsObject($author)
@@ -265,9 +272,8 @@ class CommentServices extends AbstractExtension
             ];
         }
 
-		$eventDispatcher = $this->container->get('event_dispatcher');
 		$event = new UserImageEvent($author);
-		$eventDispatcher->dispatch($event, NetlivaCommenterEvents::USER_IMAGE);
+        $this->dispatcher->dispatch($event, NetlivaCommenterEvents::USER_IMAGE);
 		return [
 			'id'    => $author->getId(),
 			'name'  => (string)$author,
@@ -290,10 +296,9 @@ class CommentServices extends AbstractExtension
         {
             $preloadComments = $this->loadComments($group, $options['list_type'], 1, $options);
         }
-        
-		$eventDispatcher = $this->container->get('event_dispatcher');
-		$event           = new CommentBoxEvent($group, $options);
-		$eventDispatcher->dispatch($event, NetlivaCommenterEvents::COMMENT_BOX);
+
+        $event = new CommentBoxEvent($group, $options);
+        $this->dispatcher->dispatch($event, NetlivaCommenterEvents::COMMENT_BOX);
 
 
 		return $this->environment->render("@NetlivaComment/comments.html.twig", array(

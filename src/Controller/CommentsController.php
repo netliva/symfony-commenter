@@ -109,9 +109,8 @@ class CommentsController extends AbstractController
 		$em = $this->getDoctrine()->getManager();
 
 
-		$eventDispatcher = $this->get('event_dispatcher');
 		$event = new AfterAddCollaboratorsEvent($em->getRepository(AuthorInterface::class)->find($request->request->get('author')), $collaborators, $group);
-		$eventDispatcher->dispatch($event, NetlivaCommenterEvents::AFTER_ADD_COLLABORATOR);
+        $this->dispatcher->dispatch($event, NetlivaCommenterEvents::AFTER_ADD_COLLABORATOR);
 
 
 		return new JsonResponse( ["situ" => "success"] );

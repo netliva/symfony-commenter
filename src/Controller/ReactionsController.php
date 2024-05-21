@@ -75,7 +75,7 @@ class ReactionsController extends AbstractController
 	public function historyAction(Comments $comment)
 	{
 		return $this->render('@NetlivaComment/reaction_history.html.twig', [
-			"emotions"  => $this->container->getParameter('netliva_commenter.emotions'),
+			"emotions"  => $this->getParameter('netliva_commenter.emotions'),
 			'reactions' => $comment->getReactions()
 		]);
 	}

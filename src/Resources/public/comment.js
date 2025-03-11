@@ -556,10 +556,32 @@
 				},
 				autosize: function (e) {
 					var el = $(this);
-					setTimeout(function(){
-						el.css({"height": "auto"});
-						el.css({"height": el.prop("scrollHeight") + 'px'});
-					},0);
+					var originalHeight = el.height();
+
+					// Görünmez bir klon oluştur
+					var clone = el.clone()
+						.css({
+								 'position': 'absolute',
+								 'visibility': 'hidden',
+								 'height': 'auto',
+								 'width': el.width() + 'px'
+							 })
+						.attr('tabindex', -1);
+
+					// Klonu body'e ekle
+					el.after(clone);
+
+					setTimeout(function () {
+						// Yeni yüksekliği klondan hesapla
+						var newHeight = clone.prop("scrollHeight");
+						// Klonu kaldır
+						clone.remove();
+
+						// Yüksekliği güncelle
+						if (newHeight !== originalHeight) {
+							el.css("height", newHeight + "px");
+						}
+					}, 0);
 				},
 				send: function () {
 					commenter.send($(this).closest(".comment-input-container"), true)

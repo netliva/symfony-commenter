@@ -25,6 +25,7 @@ class CommentServices extends AbstractExtension
     private $environment = null;
     private $cachePath;
     private $limitPerPage = 6;
+    private $dispatcher;
 
     public function __construct(
         EntityManagerInterface $em,

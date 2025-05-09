@@ -233,8 +233,12 @@ class CommentServices extends AbstractExtension
             $this->reCreateCacheData($group);
         }
 
-        $comments      = json_decode(file_get_contents($filePath), true);
-        $all           = count($comments);
+        $comments = json_decode(file_get_contents($filePath), true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            $this->reCreateCacheData($group);
+            $comments = json_decode(file_get_contents($filePath), true);
+        }
+
         if (!$comments) $comments = [];
         $comments      = $this->sort($comments, 'addAt', 'desc');
         $count         = count($comments);

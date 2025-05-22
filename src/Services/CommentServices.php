@@ -7,6 +7,7 @@ use Netliva\CommentBundle\Entity\AuthorInterface;
 use Netliva\CommentBundle\Entity\Comments;
 use Netliva\CommentBundle\Entity\CommentsGroupInfo;
 use Netliva\CommentBundle\Entity\Reactions;
+use Netliva\CommentBundle\Event\AfterAddCommentEvent;
 use Netliva\CommentBundle\Event\CommentBoxEvent;
 use Netliva\CommentBundle\Event\NetlivaCommenterEvents;
 use Netliva\CommentBundle\Event\UserImageEvent;
@@ -315,6 +316,50 @@ class CommentServices extends AbstractExtension
             'topContent'      => $event->getTopContent(),
 		));
 	}
+
+    public function newComment (string $group, string $comment) 
+    {
+		$entity = new Comments();
+
+		$entity->setAddAt(new \DateTime());
+		$entity->setAuthorStr($this->getUser());
+		$entity->setAuthor($this->getUser());
+		$entity->setGroup($group);
+		$entity->setComment($comment);
+
+
+		$this->em->persist($entity);
+		$this->em->flush();
+
+
+		$collaborators = $this->addCollaborators($group, $this->getUser()->getId());
+
+		$event = new AfterAddCommentEvent($entity, $collaborators);
+        $this->dispatcher->dispatch($event, NetlivaCommenterEvents::AFTER_ADD);
+
+        return $entity;
+    }
+
+    public function addCollaborators ($group, $authorId)
+	{
+		$colInfoEntity = $this->em->getRepository(CommentsGroupInfo::class)->findOneBy(['group' => $group, 'key'=> 'collaborators']);
+		if (!$colInfoEntity)
+		{
+			$colInfoEntity = new CommentsGroupInfo();
+			$colInfoEntity->setGroup($group);
+			$colInfoEntity->setKey("collaborators");
+			$colInfoEntity->setInfo([]);
+			$this->em->persist($colInfoEntity);
+		}
+		$collaborators = $colInfoEntity->getInfo();
+		if (!in_array($authorId, $collaborators))
+			$collaborators[] = $authorId;
+		$colInfoEntity->setInfo($collaborators);
+		$this->em->flush();
+
+		return $collaborators;
+	}
+
 
 	public function getReactionCounts (array $reactions)
 	{

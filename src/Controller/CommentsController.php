@@ -21,10 +21,10 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class CommentsController extends AbstractController
 {
-    private $dispatcher;
-    public function __construct (EventDispatcherInterface $dispatcher) {
-        $this->dispatcher = $dispatcher;
-    }
+    public function __construct (
+		private readonly EventDispatcherInterface $dispatcher,
+		private readonly CommentServices $commentServices
+	) { }
 
     /**
      * @Route(name="netliva_symfony_comments_list", path="/comments/list/{group}/{listType}/{page}", defaults={"page": "1"})
@@ -40,7 +40,6 @@ class CommentsController extends AbstractController
      */
 	public function createAction(Request $request)
 	{
-		$entity = new Comments();
 
 		$comment = $request->request->get("comment");
 		$group = $request->request->get("group");
@@ -50,29 +49,14 @@ class CommentsController extends AbstractController
 			$err = [];
 			if (!$comment) $err[] = "Yorum Girmediniz!";
 			if (!$group) $err[] = "Yorum Grubu Ayarlanmamış!";
-
+			
 			return new JsonResponse( ["situ" => "error", "errors"=> $err], 500);
 		}
-
-		$entity->setAddAt(new \DateTime());
-		$entity->setAuthorStr($this->getUser());
-		$entity->setAuthor($this->getUser());
-		$entity->setGroup($group);
-		$entity->setComment($comment);
-
-		$em = $this->getDoctrine()->getManager();
-
-		$em->persist($entity);
-		$em->flush();
+		
+		$commentEntity = $this->commentServices->newComment($group, $comment);
 
 
-		$collaborators = $this->addCollaborators($group, $this->getUser()->getId());
-
-		$event = new AfterAddCommentEvent($entity, $collaborators);
-        $this->dispatcher->dispatch($event, NetlivaCommenterEvents::AFTER_ADD);
-
-
-		return new JsonResponse( ["situ" => "success", 'id' => $entity->getId()] );
+		return new JsonResponse( ["situ" => "success", 'id' => $commentEntity->getId()] );
 	}
 
     /**
@@ -105,7 +89,7 @@ class CommentsController extends AbstractController
      */
 	public function createCollaboratorsAction (Request $request, $group)
 	{
-		$collaborators = $this->addCollaborators($group, $request->request->get('author'));
+		$collaborators = $this->commentServices->addCollaborators($group, $request->request->get('author'));
 		$em = $this->getDoctrine()->getManager();
 
 
@@ -116,23 +100,6 @@ class CommentsController extends AbstractController
 		return new JsonResponse( ["situ" => "success"] );
 	}
 
-	private function commentNotify($identify, $whoId, $textId, $vars, $link)
-	{
-		$notify = $this->notifier->isThereNotify($identify, $whoId, $textId);
-		if ($notify)
-		{
-			$oldVars = $notify->getVars();
-			if (!in_array($this->getUser()->getName(), $oldVars["{who}"]))
-			{
-				$oldVars["{who}"][] = $this->getUser()->getName();
-				$vars = ["{who}" =>  $oldVars["{who}"]];
-				$this->notifier->updateVarsOfNotify($identify, $whoId, $textId, $vars);
-			}
-		}
-		else
-			$this->notifier->addNewNotify($identify, $whoId, $textId, $vars, $link, "info", "comment");
-
-	}
 
     /**
      * @Route(name="netliva_symfony_comments_history", path="/comments/history/{id}")
@@ -219,25 +186,4 @@ class CommentsController extends AbstractController
 		return new JsonResponse( array('situ' => "success", "id" => $id) );
 	}
 
-	private function addCollaborators ($group, $authorId)
-	{
-		$em = $this->getDoctrine()->getManager();
-
-		$colInfoEntity = $em->getRepository(CommentsGroupInfo::class)->findOneBy(['group' => $group, 'key'=> 'collaborators']);
-		if (!$colInfoEntity)
-		{
-			$colInfoEntity = new CommentsGroupInfo();
-			$colInfoEntity->setGroup($group);
-			$colInfoEntity->setKey("collaborators");
-			$colInfoEntity->setInfo([]);
-			$em->persist($colInfoEntity);
-		}
-		$collaborators = $colInfoEntity->getInfo();
-		if (!in_array($authorId, $collaborators))
-			$collaborators[] = $authorId;
-		$colInfoEntity->setInfo($collaborators);
-		$em->flush();
-
-		return $collaborators;
-	}
 }

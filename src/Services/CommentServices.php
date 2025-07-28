@@ -54,14 +54,14 @@ class CommentServices extends AbstractExtension
         return $this->container->get('security.token_storage')->getToken()->getUser();
     }
 
-    public function getFilters()
+    public function getFilters(): array
     {
         return array(
             new TwigFilter('prepareCollaboratorsObject', [$this, 'prepareCollaboratorsObject'], array('is_safe' => array('html'))),
         );
     }
 
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return array(
             new TwigFunction('commentbox', [$this, 'commentBox'], array('is_safe' => array('html'))),

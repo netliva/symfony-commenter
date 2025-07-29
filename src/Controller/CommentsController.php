@@ -2,12 +2,10 @@
 
 namespace Netliva\CommentBundle\Controller;
 
-use Doctrine\ORM\EntityManager;
 use Netliva\CommentBundle\Entity\AuthorInterface;
 use Netliva\CommentBundle\Entity\Comments;
 use Netliva\CommentBundle\Entity\CommentsGroupInfo;
 use Netliva\CommentBundle\Event\AfterAddCollaboratorsEvent;
-use Netliva\CommentBundle\Event\AfterAddCommentEvent;
 use Netliva\CommentBundle\Event\NetlivaCommenterEvents;
 use Netliva\CommentBundle\Services\CommentServices;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -23,22 +21,19 @@ class CommentsController extends AbstractController
 {
     public function __construct (
 		private readonly EventDispatcherInterface $dispatcher,
-		private readonly CommentServices $commentServices
+		private readonly CommentServices $commentServices,
+        private readonly \Doctrine\Persistence\ManagerRegistry $managerRegistry
 	) { }
 
-    /**
-     * @Route(name="netliva_symfony_comments_list", path="/comments/list/{group}/{listType}/{page}", defaults={"page": "1"})
-     */
-	public function listAction($group, $listType, $page, Request $request, CommentServices $commentServices)
+    #[Route(name: 'netliva_symfony_comments_list', path: '/comments/list/{group}/{listType}/{page}', defaults: ['page' => '1'])]
+    public function listAction($group, $listType, $page, Request $request, CommentServices $commentServices)
 	{
 		return new JsonResponse($commentServices->loadComments($group, $listType, $page, $request->request->get('options')));
 	}
 
 
-    /**
-     * @Route(name="netliva_symfony_comments_create", path="/comments/create")
-     */
-	public function createAction(Request $request)
+    #[Route(name: 'netliva_symfony_comments_create', path: '/comments/create')]
+    public function createAction(Request $request)
 	{
 
 		$comment = $request->request->get("comment");
@@ -59,12 +54,10 @@ class CommentsController extends AbstractController
 		return new JsonResponse( ["situ" => "success", 'id' => $commentEntity->getId()] );
 	}
 
-    /**
-     * @Route(name="netliva_symfony_remove_me", path="/collaborators/remove/{group}")
-     */
-	public function removeCollaboratorsAction (Request $request, $group)
+    #[Route(name: 'netliva_symfony_remove_me', path: '/collaborators/remove/{group}')]
+    public function removeCollaboratorsAction (Request $request, $group)
 	{
-		$em = $this->getDoctrine()->getManager();
+		$em = $this->managerRegistry->getManager();
 
 		$colInfoEntity = $em->getRepository(CommentsGroupInfo::class)->findOneBy(['group' => $group, 'key'=> 'collaborators']);
 
@@ -84,13 +77,11 @@ class CommentsController extends AbstractController
 	}
 
 
-    /**
-     * @Route(name="netliva_symfony_new_collaborators", path="/collaborators/create/{group}")
-     */
-	public function createCollaboratorsAction (Request $request, $group)
+    #[Route(name: 'netliva_symfony_new_collaborators', path: '/collaborators/create/{group}')]
+    public function createCollaboratorsAction (Request $request, $group)
 	{
 		$collaborators = $this->commentServices->addCollaborators($group, $request->request->get('author'));
-		$em = $this->getDoctrine()->getManager();
+		$em = $this->managerRegistry->getManager();
 
 
 		$event = new AfterAddCollaboratorsEvent($em->getRepository(AuthorInterface::class)->find($request->request->get('author')), $collaborators, $group);
@@ -101,12 +92,10 @@ class CommentsController extends AbstractController
 	}
 
 
-    /**
-     * @Route(name="netliva_symfony_comments_history", path="/comments/history/{id}")
-     */
-	public function historyAction($id)
+    #[Route(name: 'netliva_symfony_comments_history', path: '/comments/history/{id}')]
+    public function historyAction($id)
 	{
-		$em = $this->getDoctrine()->getManager();
+		$em = $this->managerRegistry->getManager();
 		$entity = $em->getRepository(Comments::class)->find($id);
 
 		if (!$entity) {
@@ -120,12 +109,10 @@ class CommentsController extends AbstractController
 	}
 
 
-    /**
-     * @Route(name="netliva_symfony_comments_update", path="/comments/update/{viewtype}/{id}")
-     */
-	public function updateAction(Request $request, $id, $viewtype, CommentServices $commentServices)
+    #[Route(name: 'netliva_symfony_comments_update', path: '/comments/update/{viewtype}/{id}')]
+    public function updateAction(Request $request, $id, $viewtype, CommentServices $commentServices)
 	{
-		$em = $this->getDoctrine()->getManager();
+		$em = $this->managerRegistry->getManager();
 		/** @var Comments $entity */
 		$entity = $em->getRepository(Comments::class)->find($id);
 
@@ -167,12 +154,10 @@ class CommentsController extends AbstractController
 
 	}
 
-    /**
-     * @Route(name="netliva_symfony_comments_delete", path="/comments/delete/{id}")
-     */
-	public function deleteAction(Request $request, $id)
+    #[Route(name: 'netliva_symfony_comments_delete', path: '/comments/delete/{id}')]
+    public function deleteAction(Request $request, $id)
 	{
-		$em = $this->getDoctrine()->getManager();
+		$em = $this->managerRegistry->getManager();
 		$entity = $em->getRepository(Comments::class)->find($id);
 
 		if (!$entity) {

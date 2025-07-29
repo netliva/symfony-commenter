@@ -3,61 +3,51 @@
 namespace Netliva\CommentBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Netliva\CommentBundle\Entity\AuthorInterface;
-use Netliva\CommentBundle\Entity\Comments;
 
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="netliva_reactions")
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'netliva_reactions')]
 class Reactions
 {
 	/**
-	 * @var integer
-	 *
-	 * @ORM\Id()
-	 * @ORM\GeneratedValue()
-	 * @ORM\Column(type="integer")
-	 */
+     * @var integer
+     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
 	/**
-	 * @var string
-	 *
-	 * @ORM\Column(type="text")
-	 */
+     * @var string
+     */
+    #[ORM\Column(type: 'text')]
     private $reaction;
 
 	/**
-	 * @var \DateTime
-	 *
-	 * @ORM\Column(type="datetime", name="addAt")
-	 */
+     * @var \DateTime
+     */
+    #[ORM\Column(type: 'datetime', name: 'addAt')]
     private $addAt;
 
 	/**
-	 * @var string
-	 *
-	 * @ORM\Column(type="string", length=255, name="addByStr")
-	 */
-	private $addByStr;
+     * @var string
+     */
+    #[ORM\Column(type: 'string', length: 255, name: 'addByStr')]
+    private $addByStr;
 
 	/**
-	 * @var AuthorInterface
-	 *
-	 * @ORM\ManyToOne(targetEntity="AuthorInterface")
-	 * @ORM\JoinColumn(name="addBy_id")
-	 */
-	private $addBy;
+     * @var AuthorInterface
+     */
+    #[ORM\ManyToOne(targetEntity: AuthorInterface::class)]
+    #[ORM\JoinColumn(name: 'addBy_id')]
+    private $addBy;
 
 	/**
-	 * @var Comments
-	 *
-	 * @ORM\ManyToOne(targetEntity="Comments", inversedBy="reactions")
-	 * @ORM\JoinColumn()
-	 */
-	private $comment;
+     * @var Comments
+     */
+    #[ORM\ManyToOne(targetEntity: Comments::class, inversedBy: 'reactions')]
+    #[ORM\JoinColumn]
+    private $comment;
 
 
 	/**

@@ -2,43 +2,34 @@
 
 namespace Netliva\CommentBundle\EventListener;
 
-use Crm\LiftBundle\Entity\Asansorler;
-use Crm\LiftBundle\Entity\Denetimler;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\PersistentCollection;
-use Doctrine\ORM\Query;
 use Netliva\CommentBundle\Entity\Comments;
-use Netliva\CommentBundle\Entity\CommentsGroupInfo;
 use Netliva\CommentBundle\Entity\Reactions;
 use Netliva\CommentBundle\Services\CacheUpdaterServices;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class CacheClearEventListener
 {
-    private $container;
-    private $cus;
-
-    public function __construct (ContainerInterface $container, CacheUpdaterServices $cus)
+    public function __construct (
+        private readonly CacheUpdaterServices $cus
+    )
     {
-        $this->container = $container;
-        $this->cus = $cus;
     }
 
-    public function postPersist(LifecycleEventArgs $args)
+    public function postPersist(\Doctrine\ORM\Event\PostPersistEventArgs $args)
     {
         $this->controlAndClearCache('persist', $args);
     }
-    public function postUpdate(LifecycleEventArgs $args)
+    public function postUpdate(\Doctrine\ORM\Event\PostUpdateEventArgs $args)
     {
         $this->controlAndClearCache('update', $args);
     }
-    public function preRemove(LifecycleEventArgs $args)
+    public function preRemove(\Doctrine\ORM\Event\PreRemoveEventArgs $args)
     {
         $this->controlAndClearCache('remove', $args);
     }
 
-    private function controlAndClearCache (string $action, LifecycleEventArgs $args)
+    private function controlAndClearCache (string $action, \Doctrine\Persistence\Event\LifecycleEventArgs $args)
     {
         $entity = $args->getObject();
 
@@ -48,7 +39,7 @@ class CacheClearEventListener
             {
                 if (!$this->cus->openData($entity->getGroup()))
                     return;
-                
+
                 switch ($action) {
                     case 'persist': $this->cus->addData($entity); break;
                     case 'update': $this->cus->updateData($entity); break;

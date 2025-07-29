@@ -20,24 +20,16 @@ use Twig\TwigFunction;
 
 class CommentServices extends AbstractExtension
 {
-    protected $em;
-    private $container;
-    private $allCollaborators = null;
-    private $environment = null;
-    private $cachePath;
-    private $limitPerPage = 6;
-    private $dispatcher;
+    private ?array  $allCollaborators = null;
+    private string  $cachePath;
+    private int     $limitPerPage = 6;
 
     public function __construct(
-        EntityManagerInterface $em,
-        ContainerInterface $container,
-        Environment $environment,
-        EventDispatcherInterface $dispatcher
+        private readonly EntityManagerInterface $em,
+        private readonly ContainerInterface $container,
+        private readonly Environment $environment,
+        private readonly EventDispatcherInterface $dispatcher
     ){
-        $this->em = $em;
-        $this->container = $container;
-        $this->dispatcher = $dispatcher;
-        $this->environment = $environment;
 
         $cachePath = $this->container->getParameter('netliva_commenter.cache_path');
         if (!$cachePath) $cachePath = $this->container->getParameter('kernel.cache_dir').DIRECTORY_SEPARATOR.'netliva_comment';
@@ -57,15 +49,15 @@ class CommentServices extends AbstractExtension
     public function getFilters(): array
     {
         return array(
-            new TwigFilter('prepareCollaboratorsObject', [$this, 'prepareCollaboratorsObject'], array('is_safe' => array('html'))),
+            new TwigFilter('prepareCollaboratorsObject', $this->prepareCollaboratorsObject(...), array('is_safe' => array('html'))),
         );
     }
 
     public function getFunctions(): array
     {
         return array(
-            new TwigFunction('commentbox', [$this, 'commentBox'], array('is_safe' => array('html'))),
-            new TwigFunction('reaction_button', [$this, 'reactionButton'], array('is_safe' => array('html'))),
+            new TwigFunction('commentbox', $this->commentBox(...), array('is_safe' => array('html'))),
+            new TwigFunction('reaction_button', $this->reactionButton(...), array('is_safe' => array('html'))),
         );
     }
 
@@ -78,7 +70,7 @@ class CommentServices extends AbstractExtension
         $this->allCollaborators = [];
         foreach ($authors as $author)
         {
-            if ($author->isAuthor() && !key_exists($author->getId(), $this->allCollaborators))
+            if ($author->isAuthor() && !array_key_exists($author->getId(), $this->allCollaborators))
                 $this->allCollaborators[$author->getId()] = $this->prepareCollaboratorsObject($author);
         }
         uasort($this->allCollaborators, function($a, $b) {
@@ -103,7 +95,7 @@ class CommentServices extends AbstractExtension
             $collaborators = [];
             foreach ($collaboratorIds as $id)
             {
-                if ($this->allCollaborators && key_exists($id, $this->allCollaborators))
+                if ($this->allCollaborators && array_key_exists($id, $this->allCollaborators))
                 {
                     $collaborators[$id] = $this->allCollaborators[$id];
                 }
@@ -113,7 +105,7 @@ class CommentServices extends AbstractExtension
                     if ($author && $author->isAuthor())
                     {
                         $collaborators[$id] = $this->prepareCollaboratorsObject($author);
-                        if (is_array($this->allCollaborators) && !key_exists($id, $this->allCollaborators))
+                        if (is_array($this->allCollaborators) && !array_key_exists($id, $this->allCollaborators))
                             $this->allCollaborators[$id] = $collaborators[$id];
                     }
                 }
@@ -364,10 +356,9 @@ class CommentServices extends AbstractExtension
 	public function getReactionCounts (array $reactions)
 	{
 		$emotions = [];
-		/** @var Reactions $reaction */
 		foreach ($reactions as $reaction)
 		{
-			if(!key_exists($reaction, $emotions)) $emotions[$reaction] = 0;
+			if(!array_key_exists($reaction, $emotions)) $emotions[$reaction] = 0;
 			$emotions[$reaction]++;
 		}
 		return $emotions;
@@ -375,7 +366,7 @@ class CommentServices extends AbstractExtension
 
 	public function reactionButton (array $comment)
 	{
-        $reaction = key_exists($this->getUser()->getId(), $comment['reactions']) ? $comment['reactions'][$this->getUser()->getId()] : null;
+        $reaction = array_key_exists($this->getUser()->getId(), $comment['reactions']) ? $comment['reactions'][$this->getUser()->getId()] : null;
 		return $this->environment->render('@NetlivaComment/reaction_button.html.twig', [
 			'emo_counts'    => $this->getReactionCounts($comment['reactions']),
 			"comment"       => $comment,
@@ -401,12 +392,12 @@ class CommentServices extends AbstractExtension
                 $bVal = $b[$matches[1]];
                 foreach (explode('.', $matches[2]) as $item)
                 {
-                    if (is_array($aVal) && key_exists($item, $aVal))
+                    if (is_array($aVal) && array_key_exists($item, $aVal))
                         $aVal = $aVal[$item];
                     elseif ($item == 'length' && is_array($aVal))
                         $aVal = count($aVal);
 
-                    if (is_array($bVal) && key_exists($item, $bVal))
+                    if (is_array($bVal) && array_key_exists($item, $bVal))
                         $bVal = $bVal[$item];
                     elseif ($item == 'length' && is_array($bVal))
                         $bVal = count($bVal);

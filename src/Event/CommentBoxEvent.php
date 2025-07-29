@@ -2,7 +2,6 @@
 namespace Netliva\CommentBundle\Event;
 
 
-use Netliva\CommentBundle\Entity\Comments;
 use Symfony\Contracts\EventDispatcher\Event;
 
 class CommentBoxEvent extends Event

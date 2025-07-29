@@ -10,19 +10,18 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class CacheUpdaterServices
 {
-	protected $em;
-	protected $commentServices;
-	protected $container;
-	public function __construct(EntityManagerInterface $em, ContainerInterface $container, CommentServices $commentServices){
-		$this->em = $em;
-		$this->container = $container;
-        $this->commentServices = $commentServices;
+	public function __construct(
+        private readonly ContainerInterface $container,
+        private readonly CommentServices $commentServices
+    ){
     }
 
 
-    private $data = [];
-    private $dataChanged = false;
-    private $group  = null;
+    private array $data        = [];
+    private bool  $dataChanged = false;
+    private       $group       = null;
+    private string|null $cachePath = null;
+
     public function openData ($group)
     {
         $cachePath = $this->container->getParameter('netliva_commenter.cache_path');
@@ -79,14 +78,14 @@ class CacheUpdaterServices
             }
         }
     }
-    public function saveData ()
+    public function saveData (): void
     {
         if ($this->dataChanged)
         {
             $filePath  = $this->cachePath.'/'.$this->group.'.json';
             
             if(!file_exists($filePath))
-                return false;
+                return;
 
             file_put_contents($filePath, json_encode($this->data));
         }

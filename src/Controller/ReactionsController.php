@@ -2,6 +2,7 @@
 
 namespace Netliva\CommentBundle\Controller;
 
+use Netliva\CommentBundle\Entity\AuthorInterface;
 use Netliva\CommentBundle\Entity\Comments;
 use Netliva\CommentBundle\Entity\Reactions;
 use Netliva\CommentBundle\Event\AfterAddReactionEvent;
@@ -13,17 +14,16 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/comments/reaction")
- */
+#[Route(path: '/comments/reaction')]
 class ReactionsController extends AbstractController
 {
-    /**
-     * @Route(name="netliva_symfony_reaction_add", path="/add/{id}")
-     */
-	public function addAction(Request $request, Comments $comment, CommentServices $commentServices, EventDispatcherInterface $dispatcher)
+    public function __construct(private readonly \Doctrine\Persistence\ManagerRegistry $managerRegistry)
+    {
+    }
+    #[Route(name: 'netliva_symfony_reaction_add', path: '/add/{id}')]
+    public function addAction(Request $request, Comments $comment, CommentServices $commentServices, EventDispatcherInterface $dispatcher)
 	{
-		$em = $this->getDoctrine()->getManager();
+		$em = $this->managerRegistry->getManager();
 
 		$reaction = $em->getRepository(Reactions::class)->findOneBy(["comment"=>$comment, "addBy"=>$this->getUser()],['id'=>'DESC']);
 
@@ -46,10 +46,11 @@ class ReactionsController extends AbstractController
 		}
 		else if ($request->request->get("reaction"))
 		{
+            $user = $this->getUser();
 			$type = 'new';
 			$reaction = new Reactions();
 			$reaction->setAddAt(new \DateTime());
-			$reaction->setAddBy($this->getUser());
+			$reaction->setAddBy($user instanceof AuthorInterface ? $user : null);
 			$reaction->setAddByStr((string)$this->getUser());
 			$reaction->setComment($comment);
 			$reaction->setReaction($request->request->get("reaction"));
@@ -69,10 +70,8 @@ class ReactionsController extends AbstractController
 		return new JsonResponse(["situ" => "success", "type" => $type, 'counts' => $commentServices->getReactionCounts($reacts)]);
 	}
 
-    /**
-     * @Route(name="netliva_symfony_reaction_history", path="/history/{id}")
-     */
-	public function historyAction(Comments $comment)
+    #[Route(name: 'netliva_symfony_reaction_history', path: '/history/{id}')]
+    public function historyAction(Comments $comment)
 	{
 		return $this->render('@NetlivaComment/reaction_history.html.twig', [
 			"emotions"  => $this->getParameter('netliva_commenter.emotions'),

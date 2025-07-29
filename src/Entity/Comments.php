@@ -4,103 +4,87 @@ namespace Netliva\CommentBundle\Entity;
 
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Persistence\Mapping\ClassMetadata;
-use Doctrine\Persistence\ObjectManager;
-use Netliva\CommentBundle\Entity\AuthorInterface;
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="netliva_commenter")
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'netliva_commenter')]
 class Comments
 {
 	/**
-	 * @var integer
-	 *
-	 * @ORM\Id()
-	 * @ORM\GeneratedValue()
-	 * @ORM\Column(type="integer")
-	 */
+     * @var integer
+     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
 	/**
-	 * @var string
-	 *
-	 * @ORM\Column(name="`group`", type="string", length=255)
-	 */
+     * @var string
+     */
+    #[ORM\Column(name: '`group`', type: 'string', length: 255)]
     private $group;
 
 	/**
-	 * @var string
-	 *
-	 * @ORM\Column(type="text")
-	 */
+     * @var string
+     */
+    #[ORM\Column(type: 'text')]
     private $comment;
 
 	/**
-	 * @var \DateTime
-	 *
-	 * @ORM\Column(type="datetime", name="addAt")
-	 */
+     * @var \DateTime
+     */
+    #[ORM\Column(type: 'datetime', name: 'addAt')]
     private $addAt;
 
 	/**
-	 * @var string
-	 *
-	 * @ORM\Column(type="string", length=255)
-	 */
-	private $author_str;
+     * @var string
+     */
+    #[ORM\Column(type: 'string', length: 255)]
+    private $author_str;
 
 	/**
-	 * @var AuthorInterface
-	 *
-	 * @ORM\ManyToOne(targetEntity="AuthorInterface")
-	 * @ORM\JoinColumn()
-	 */
-	private $author;
+     * @var AuthorInterface
+     */
+    #[ORM\ManyToOne(targetEntity: AuthorInterface::class)]
+    #[ORM\JoinColumn]
+    private $author;
 
 	/**
-	 * @var \DateTime
-	 * @ORM\Column(type="datetime", name="editAt", nullable=true)
-	 */
+     * @var \DateTime
+     */
+    #[ORM\Column(type: 'datetime', name: 'editAt', nullable: true)]
     private $editAt;
 
 	/**
-	 * @var array
-	 *
-	 * @ORM\Column(type="json", nullable=true)
-	 */
+     * @var array
+     */
+    #[ORM\Column(type: 'json', nullable: true)]
     private $history;
 
 	/**
-	 * @var AuthorInterface
-	 *
-	 * @ORM\ManyToOne(targetEntity="AuthorInterface")
-	 * @ORM\JoinColumn(nullable=true)
-	 */
+     * @var AuthorInterface
+     */
+    #[ORM\ManyToOne(targetEntity: AuthorInterface::class)]
+    #[ORM\JoinColumn(nullable: true)]
     private $editor;
 
 	/**
-	 * @var \Doctrine\Common\Collections\Collection
-	 *
-	 * @ORM\OneToMany(targetEntity="Netliva\CommentBundle\Entity\Reactions", mappedBy="comment", cascade={"persist", "remove"})
-	 */
-	private $reactions;
+     * @var \Doctrine\Common\Collections\Collection
+     */
+    #[ORM\OneToMany(targetEntity: \Netliva\CommentBundle\Entity\Reactions::class, mappedBy: 'comment', cascade: ['persist', 'remove'])]
+    private $reactions;
 
 	/**
-	 * @var \Doctrine\Common\Collections\Collection
-	 *
-	 * @ORM\OneToMany(targetEntity="Netliva\CommentBundle\Entity\Comments", mappedBy="answerTo", cascade={"persist", "remove"})
-	 */
-	private $answers;
+     * @var \Doctrine\Common\Collections\Collection
+     */
+    #[ORM\OneToMany(targetEntity: \Netliva\CommentBundle\Entity\Comments::class, mappedBy: 'answerTo', cascade: ['persist', 'remove'])]
+    private $answers;
 
 	/**
-	 * @var Comments
-	 *
-	 * @ORM\ManyToOne(targetEntity="Netliva\CommentBundle\Entity\Comments", inversedBy="answers")
-	 * @ORM\JoinColumn(nullable=true, name="answerTo_id")
-	 */
-	private $answerTo;
+     * @var Comments
+     */
+    #[ORM\ManyToOne(targetEntity: \Netliva\CommentBundle\Entity\Comments::class, inversedBy: 'answers')]
+    #[ORM\JoinColumn(nullable: true, name: 'answerTo_id')]
+    private $answerTo;
 
 
 	/**

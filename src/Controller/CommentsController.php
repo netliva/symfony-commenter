@@ -28,7 +28,8 @@ class CommentsController extends AbstractController
     #[Route(name: 'netliva_symfony_comments_list', path: '/comments/list/{group}/{listType}/{page}', defaults: ['page' => '1'])]
     public function listAction($group, $listType, $page, Request $request, CommentServices $commentServices)
 	{
-		return new JsonResponse($commentServices->loadComments($group, $listType, $page, $request->request->get('options')));
+		$options = $request->request->all()['options'] ?? [];
+		return new JsonResponse($commentServices->loadComments($group, $listType, $page, $options));
 	}
 
 
@@ -144,10 +145,11 @@ class CommentsController extends AbstractController
         $data = $commentServices->createCommentData($entity);
 
 
+		$options = $request->request->all()['options'] ?? [];
 		$html = $this->renderView('@NetlivaComment/comment.'.$viewtype.'.html.twig', array(
 			'group' => $entity->getGroup(),
 			'comments' => [$data],
-			'options'  => $request->request->get('options'),
+			'options'  => $options,
 		));
 
 		return new JsonResponse( ['return'=>'success', 'html'=>$html] );

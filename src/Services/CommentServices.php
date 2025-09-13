@@ -13,6 +13,7 @@ use Netliva\CommentBundle\Event\NetlivaCommenterEvents;
 use Netliva\CommentBundle\Event\UserImageEvent;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Twig\Environment;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
@@ -28,7 +29,8 @@ class CommentServices extends AbstractExtension
         private readonly EntityManagerInterface $em,
         private readonly ContainerInterface $container,
         private readonly Environment $environment,
-        private readonly EventDispatcherInterface $dispatcher
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly TokenStorageInterface $tokenStorage
     ){
 
         $cachePath = $this->container->getParameter('netliva_commenter.cache_path');
@@ -43,7 +45,7 @@ class CommentServices extends AbstractExtension
 
     private function getUser()
     {
-        return $this->container->get('security.token_storage')->getToken()->getUser();
+        return $this->tokenStorage->getToken()->getUser();
     }
 
     public function getFilters(): array

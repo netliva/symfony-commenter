@@ -140,16 +140,12 @@
 			{
 				var $btnArea = reactor.area.find(".nc-reactions-button");
 				$btnArea.hover(function () {
-					const alanfark = $(this).closest('.netliva-comments-area').width()
-						- (
-							(
-								$(this).offset().left
-								- $(this).closest('.netliva-comments-area').offset().left
-							)
-							+ $(this).find('.nc-reactions-box').width()
-						);
-					const left = alanfark < 0 ? alanfark + 20 : -($(this).find('.nc-reactions-box').width()/3);
-					$(this).find('.nc-reactions-box').css('left', left+"px");
+					const btn = $(this);
+					const box = btn.find('.nc-reactions-box');
+					const area = btn.closest('.netliva-comments-area');
+					const btnRight = area.width() - (btn.offset().left - area.offset().left);
+					const left = btnRight < box.width()*2/3 ? box.width() - btnRight - 20 : (box.width()/3);
+					box.css('left', -left+"px");
 				});
 				// console.log($btnArea);
 				$btnArea.find(".nc-reaction").click(function(){

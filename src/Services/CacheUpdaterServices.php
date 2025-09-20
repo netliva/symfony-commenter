@@ -24,13 +24,7 @@ class CacheUpdaterServices
 
     public function openData ($group)
     {
-        $cachePath = $this->container->getParameter('netliva_commenter.cache_path');
-        if (!$cachePath) $cachePath = $this->container->getParameter('kernel.cache_dir').DIRECTORY_SEPARATOR.'netliva_comment';
-
-        if(!is_dir($cachePath))
-            mkdir($cachePath, 0777, true);
-
-        $this->cachePath = $cachePath;
+        $this->cachePath = $this->getCachePath();
 
         $filePath  = $this->cachePath.'/'.$group.'.json';
         
@@ -88,6 +82,25 @@ class CacheUpdaterServices
                 return;
 
             file_put_contents($filePath, json_encode($this->data));
+        }
+    }
+    private function getCachePath () {
+        $cachePath = $this->container->getParameter('netliva_commenter.cache_path');
+        if (!$cachePath) $cachePath = $this->container->getParameter('kernel.cache_dir').DIRECTORY_SEPARATOR.'netliva_comment';
+
+        if(!is_dir($cachePath))
+            mkdir($cachePath, 0777, true);
+
+        return $cachePath;
+    }
+
+    public function clearCache($group): void
+    {
+
+        $filePath = $this->getCachePath().'/'.$group.'.json';
+        
+        if (file_exists($filePath)) {
+            unlink($filePath);
         }
     }
 

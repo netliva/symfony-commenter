@@ -347,9 +347,11 @@ class CommentServices extends AbstractExtension
 		}
 		$collaborators = $colInfoEntity->getInfo();
 		if (!in_array($authorId, $collaborators))
-			$collaborators[] = $authorId;
-		$colInfoEntity->setInfo($collaborators);
-		$this->em->flush();
+        {
+            $collaborators[] = $authorId;
+            $colInfoEntity->setInfo($collaborators);
+            $this->em->flush();
+        }
 
 		return $collaborators;
 	}

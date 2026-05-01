@@ -742,10 +742,11 @@
 			},
 		};
 
-
-		$(this).addClass("binded");
-		commenter.init($(this), settings);
-
+		if ($(this).length > 0)
+		{
+			$(this).addClass("binded");
+			commenter.init($(this), settings);
+		}
 	};
 
 

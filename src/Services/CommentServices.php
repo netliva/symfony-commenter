@@ -45,7 +45,7 @@ class CommentServices extends AbstractExtension
 
     private function getUser()
     {
-        return $this->tokenStorage->getToken()->getUser();
+        return $this->tokenStorage->getToken()?->getUser();
     }
 
     public function getFilters(): array
@@ -316,7 +316,7 @@ class CommentServices extends AbstractExtension
 		$entity = new Comments();
 
 		$entity->setAddAt(new \DateTime());
-		$entity->setAuthorStr($this->getUser());
+		$entity->setAuthorStr($this->getUser()?:'');
 		$entity->setAuthor($this->getUser());
 		$entity->setGroup($group);
 		$entity->setComment($comment);
@@ -325,12 +325,13 @@ class CommentServices extends AbstractExtension
 		$this->em->persist($entity);
 		$this->em->flush();
 
+		if ($this->getUser())
+		{
+			$collaborators = $this->addCollaborators($group, $this->getUser()->getId());
 
-		$collaborators = $this->addCollaborators($group, $this->getUser()->getId());
-
-		$event = new AfterAddCommentEvent($entity, $collaborators);
-        $this->dispatcher->dispatch($event, NetlivaCommenterEvents::AFTER_ADD);
-
+			$event = new AfterAddCommentEvent($entity, $collaborators);
+        	$this->dispatcher->dispatch($event, NetlivaCommenterEvents::AFTER_ADD);
+		}
         return $entity;
     }
 
@@ -368,7 +369,7 @@ class CommentServices extends AbstractExtension
 
 	public function reactionButton (array $comment)
 	{
-        $reaction = array_key_exists($this->getUser()->getId(), $comment['reactions']) ? $comment['reactions'][$this->getUser()->getId()] : null;
+        $reaction = ($this->getUser() && array_key_exists($this->getUser()->getId(), $comment['reactions'])) ? $comment['reactions'][$this->getUser()->getId()] : null;
 		return $this->environment->render('@NetlivaComment/reaction_button.html.twig', [
 			'emo_counts'    => $this->getReactionCounts($comment['reactions']),
 			"comment"       => $comment,

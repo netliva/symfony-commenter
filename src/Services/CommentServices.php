@@ -311,12 +311,12 @@ class CommentServices extends AbstractExtension
 		));
 	}
 
-    public function newComment (string $group, string $comment) 
+    public function newComment (string $group, string $comment, ?string $specialName=null) 
     {
 		$entity = new Comments();
 
 		$entity->setAddAt(new \DateTime());
-		$entity->setAuthorStr($this->getUser()?:'');
+		$entity->setAuthorStr($specialName?:($this->getUser()?:''));
 		$entity->setAuthor($this->getUser());
 		$entity->setGroup($group);
 		$entity->setComment($comment);
